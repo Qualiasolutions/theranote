@@ -12,15 +12,15 @@
 | Category | Done | Total | % |
 |----------|------|-------|---|
 | Authentication | 4 | 4 | 100% |
-| Session Notes | 11 | 13 | 85% |
+| Session Notes | 13 | 13 | 100% |
 | Goal Tracking | 8 | 8 | 100% |
-| Compliance | 5 | 10 | 50% |
-| Reports/Exports | 7 | 10 | 70% |
-| Admin Dashboard | 5 | 10 | 50% |
-| AI Features | 3 | 8 | 38% |
+| Compliance | 6 | 10 | 60% |
+| Reports/Exports | 9 | 10 | 90% |
+| Admin Dashboard | 6 | 10 | 60% |
+| AI Features | 5 | 8 | 63% |
 | Incidents | 6 | 6 | 100% |
 | Student Mgmt | 6 | 7 | 86% |
-| **TOTAL** | **55** | **76** | **72%** |
+| **TOTAL** | **63** | **76** | **83%** |
 
 ---
 
@@ -52,8 +52,8 @@
 
 ### Formats
 - [x] SOAP format
-- [ ] Narrative format toggle
-- [ ] DOE-specific format export
+- [x] Narrative format toggle
+- [x] DOE-specific format export (`/api/export/service-log-doe`)
 
 **Files:** `src/app/(dashboard)/sessions/`, `src/components/sessions/soap-editor.tsx`
 
@@ -87,7 +87,7 @@
 - [x] Compliance score (0-100)
 
 ### Missing Rules
-- [ ] Make-up session calculation & tracking
+- [x] Make-up session calculation & tracking (original_session_id linking)
 - [ ] Service frequency compliance alerts
 - [ ] DOE/NYSED specific prompts
 - [ ] Medicaid compliance rules
@@ -111,7 +111,7 @@
 
 ### PDF/Other
 - [x] PDF export for progress reports (`/api/export/pdf` with @react-pdf/renderer)
-- [ ] DOE/NYC-specific service log format
+- [x] DOE/NYC-specific service log format (`/api/export/service-log-doe`)
 - [ ] Medicaid billing export format
 - [ ] Weekly report generation
 
@@ -130,7 +130,7 @@
 
 ### Missing
 - [ ] Class roster management (no "classes" entity)
-- [ ] Caseload assignment UI (therapists self-manage)
+- [x] Caseload assignment UI (`/admin/caseloads`)
 - [ ] Per-therapist compliance view
 - [ ] Audit log viewer with filtering
 - [ ] Staff attendance tracking
@@ -147,8 +147,8 @@
 - [x] Context-aware suggestions (student name, goals)
 
 ### Missing
-- [ ] Full note auto-generation/completion
-- [ ] Missing element detection alerts
+- [x] Full note auto-generation/completion (`/api/ai/generate-note`)
+- [x] Missing element detection alerts (`/api/ai/analyze-note`)
 - [ ] DOE-compliant language suggestions
 - [ ] Auto-generate parent notification letters
 - [ ] Progress report auto-summarization
@@ -242,16 +242,16 @@
 2. [x] Progress graphs for goal tracking (ProgressChart + SingleGoalProgressChart)
 3. [x] PDF export for reports (`/api/export/pdf` with @react-pdf/renderer)
 
-### P1 - High (Demo Quality)
-4. [ ] Make-up session tracking
-5. [ ] DOE format service log export
-6. [ ] AI auto-generation for full notes
-7. [ ] Caseload assignment UI for admins
+### P1 - High (Demo Quality) ✅ COMPLETE
+4. [x] Make-up session tracking (original_session_id linking)
+5. [x] DOE format service log export (`/api/export/service-log-doe`)
+6. [x] AI auto-generation for full notes (`/api/ai/generate-note`)
+7. [x] Caseload assignment UI for admins (`/admin/caseloads`)
 
-### P2 - Medium (Nice to Have)
-8. [ ] Missing element detection
+### P2 - Medium (Nice to Have) - Partial
+8. [x] Missing element detection (`/api/ai/analyze-note`)
 9. [ ] Per-therapist admin views
-10. [ ] Narrative format toggle
+10. [x] Narrative format toggle (soap-editor)
 11. [ ] Weekly report generation
 
 ### P3 - Low (Future)

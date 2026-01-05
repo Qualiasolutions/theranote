@@ -44,3 +44,4 @@ coverage
 # BMAD (keep these)
 !_bmad
 !_bmad-output
+.env*.local

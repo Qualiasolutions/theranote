@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { AIPromptsPanel } from './ai-prompts-panel'
 import { GoalProgressTracker } from './goal-progress-tracker'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2, Save, CheckCircle, Sparkles } from 'lucide-react'
+import { Loader2, Save, CheckCircle, Sparkles, Link2, FileText, Wand2, AlertCircle } from 'lucide-react'
 
 // Extended student type for the editor (allows passing joined data)
 interface StudentForEditor {
@@ -18,6 +18,13 @@ interface StudentForEditor {
   first_name: string
   last_name: string
   discipline?: string
+}
+
+interface MissedSession {
+  id: string
+  session_date: string
+  start_time: string
+  end_time: string
 }
 
 interface SOAPEditorProps {
@@ -36,6 +43,9 @@ interface SOAPEditorProps {
     assessment: string | null
     plan: string | null
     status: string
+    original_session_id?: string | null
+    note_format?: 'soap' | 'narrative'
+    narrative_notes?: string | null
   }
 }
 
@@ -51,6 +61,8 @@ export function SOAPEditor({
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState<'S' | 'O' | 'A' | 'P'>('S')
   const [showAIPanel, setShowAIPanel] = useState(true)
+  const [generatingNote, setGeneratingNote] = useState(false)
+  const [aiWarnings, setAiWarnings] = useState<string[]>([])
 
   // Goals state
   interface Goal {
@@ -68,6 +80,18 @@ export function SOAPEditor({
   }
   const [goals, setGoals] = useState<Goal[]>([])
   const [goalProgress, setGoalProgress] = useState<GoalProgress[]>([])
+
+  // Makeup session linking
+  const [missedSessions, setMissedSessions] = useState<MissedSession[]>([])
+  const [originalSessionId, setOriginalSessionId] = useState<string | null>(
+    existingSession?.original_session_id || null
+  )
+
+  // Note format toggle (SOAP vs Narrative)
+  const [noteFormat, setNoteFormat] = useState<'soap' | 'narrative'>(
+    existingSession?.note_format || 'soap'
+  )
+  const [narrativeNotes, setNarrativeNotes] = useState(existingSession?.narrative_notes || '')
 
   // Form state
   const [studentId, setStudentId] = useState(existingSession?.student_id || '')
@@ -128,6 +152,109 @@ export function SOAPEditor({
     loadGoals()
   }, [studentId, existingSession, supabase])
 
+  // Load missed sessions when attendance is "makeup" and student changes
+  useEffect(() => {
+    const loadMissedSessions = async () => {
+      if (attendanceStatus !== 'makeup' || !studentId) {
+        setMissedSessions([])
+        return
+      }
+
+      // Get absent sessions for this student that don't have a makeup linked
+      const { data } = await supabase
+        .from('sessions')
+        .select('id, session_date, start_time, end_time')
+        .eq('student_id', studentId)
+        .eq('attendance_status', 'absent')
+        .is('original_session_id', null)
+        .order('session_date', { ascending: false })
+        .limit(20)
+
+      setMissedSessions((data as MissedSession[]) || [])
+    }
+
+    loadMissedSessions()
+  }, [studentId, attendanceStatus, supabase])
+
+  // Generate full SOAP note with AI
+  const handleGenerateFullNote = async () => {
+    if (!studentId) {
+      alert('Please select a student first')
+      return
+    }
+
+    setGeneratingNote(true)
+    setAiWarnings([])
+
+    try {
+      const response = await fetch('/api/ai/generate-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discipline: selectedStudent?.discipline || discipline,
+          studentName: selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : undefined,
+          goals: goals.map(g => ({ description: g.description, domain: g.domain })),
+          sessionDate,
+          attendanceStatus,
+          noteFormat,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to generate note')
+
+      const data = await response.json()
+
+      if (noteFormat === 'soap') {
+        setSubjective(data.subjective || '')
+        setObjective(data.objective || '')
+        setAssessment(data.assessment || '')
+        setPlan(data.plan || '')
+      } else {
+        setNarrativeNotes(data.narrative || '')
+      }
+
+      if (data.warnings) {
+        setAiWarnings(data.warnings)
+      }
+    } catch {
+      alert('Failed to generate note. Please try again.')
+    } finally {
+      setGeneratingNote(false)
+    }
+  }
+
+  // Analyze note for missing elements
+  const analyzeNote = async () => {
+    if (noteFormat === 'soap' && (!subjective || !objective || !assessment || !plan)) {
+      return // Don't analyze incomplete notes
+    }
+
+    try {
+      const response = await fetch('/api/ai/analyze-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          noteFormat,
+          subjective,
+          objective,
+          assessment,
+          plan,
+          narrativeNotes,
+          discipline: selectedStudent?.discipline || discipline,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.warnings?.length > 0) {
+          setAiWarnings(data.warnings)
+        }
+      }
+    } catch {
+      // Silent fail for analysis
+    }
+  }
+
   const saveGoalProgress = async (sessionId: string) => {
     // Delete existing progress for this session
     await supabase
@@ -168,10 +295,13 @@ export function SOAPEditor({
       end_time: endTime,
       attendance_status: attendanceStatus as 'present' | 'absent' | 'makeup' | 'cancelled',
       discipline: selectedStudent?.discipline || discipline,
-      subjective: subjective || null,
-      objective: objective || null,
-      assessment: assessment || null,
-      plan: plan || null,
+      subjective: noteFormat === 'soap' ? (subjective || null) : null,
+      objective: noteFormat === 'soap' ? (objective || null) : null,
+      assessment: noteFormat === 'soap' ? (assessment || null) : null,
+      plan: noteFormat === 'soap' ? (plan || null) : null,
+      narrative_notes: noteFormat === 'narrative' ? (narrativeNotes || null) : null,
+      note_format: noteFormat,
+      original_session_id: attendanceStatus === 'makeup' ? originalSessionId : null,
       status: 'draft' as const,
     }
 
@@ -214,10 +344,21 @@ export function SOAPEditor({
   }
 
   const handleSign = async () => {
-    if (!subjective || !objective || !assessment || !plan) {
-      alert('Please complete all SOAP sections before signing')
-      return
+    // Validate based on note format
+    if (noteFormat === 'soap') {
+      if (!subjective || !objective || !assessment || !plan) {
+        alert('Please complete all SOAP sections before signing')
+        return
+      }
+    } else {
+      if (!narrativeNotes) {
+        alert('Please complete the session notes before signing')
+        return
+      }
     }
+
+    // Run analysis before signing
+    await analyzeNote()
 
     setLoading(true)
 
@@ -229,10 +370,13 @@ export function SOAPEditor({
       end_time: endTime,
       attendance_status: attendanceStatus as 'present' | 'absent' | 'makeup' | 'cancelled',
       discipline: selectedStudent?.discipline || discipline,
-      subjective,
-      objective,
-      assessment,
-      plan,
+      subjective: noteFormat === 'soap' ? subjective : null,
+      objective: noteFormat === 'soap' ? objective : null,
+      assessment: noteFormat === 'soap' ? assessment : null,
+      plan: noteFormat === 'soap' ? plan : null,
+      narrative_notes: noteFormat === 'narrative' ? narrativeNotes : null,
+      note_format: noteFormat,
+      original_session_id: attendanceStatus === 'makeup' ? originalSessionId : null,
       status: 'signed' as const,
       signed_at: new Date().toISOString(),
     }
@@ -361,23 +505,139 @@ export function SOAPEditor({
                 />
               </div>
             </div>
+
+            {/* Makeup Session Linking */}
+            {attendanceStatus === 'makeup' && studentId && missedSessions.length > 0 && (
+              <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                <Label htmlFor="original-session" className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <Link2 className="h-4 w-4" />
+                  Link to Missed Session
+                </Label>
+                <select
+                  id="original-session"
+                  value={originalSessionId || ''}
+                  onChange={(e) => setOriginalSessionId(e.target.value || null)}
+                  className="mt-2 flex h-10 w-full rounded-md border border-amber-300 bg-white dark:bg-amber-950/30 px-3 py-2 text-sm"
+                >
+                  <option value="">Select missed session to link...</option>
+                  {missedSessions.map((session) => (
+                    <option key={session.id} value={session.id}>
+                      {new Date(session.session_date).toLocaleDateString()} ({session.start_time} - {session.end_time})
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                  Link this makeup session to the original missed session for compliance tracking
+                </p>
+              </div>
+            )}
+
+            {attendanceStatus === 'makeup' && studentId && missedSessions.length === 0 && (
+              <div className="mt-4 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  No missed sessions found for this student to link.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* SOAP Sections */}
+        {/* Session Notes */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>SOAP Note</CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAIPanel(!showAIPanel)}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {showAIPanel ? 'Hide' : 'Show'} AI Assist
-            </Button>
+          <CardHeader className="space-y-4">
+            <div className="flex flex-row items-center justify-between">
+              <CardTitle>{noteFormat === 'soap' ? 'SOAP Note' : 'Session Notes'}</CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateFullNote}
+                  disabled={generatingNote || !studentId}
+                >
+                  {generatingNote ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Wand2 className="h-4 w-4 mr-2" />
+                  )}
+                  Auto-fill
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAIPanel(!showAIPanel)}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  {showAIPanel ? 'Hide' : 'Show'} AI
+                </Button>
+              </div>
+            </div>
+
+            {/* Note Format Toggle */}
+            <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setNoteFormat('soap')}
+                  className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                    noteFormat === 'soap'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background hover:bg-accent'
+                  }`}
+                >
+                  SOAP Format
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNoteFormat('narrative')}
+                  className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                    noteFormat === 'narrative'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background hover:bg-accent'
+                  }`}
+                >
+                  Narrative Format
+                </button>
+              </div>
+            </div>
+
+            {/* AI Warnings */}
+            {aiWarnings.length > 0 && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Note Review Suggestions</p>
+                    <ul className="mt-1 text-xs text-amber-600 dark:text-amber-400 space-y-1">
+                      {aiWarnings.map((warning, i) => (
+                        <li key={i}>• {warning}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Narrative Mode */}
+            {noteFormat === 'narrative' ? (
+              <div>
+                <Label htmlFor="narrative" className="text-lg font-semibold">
+                  Session Notes
+                </Label>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Document the session in narrative format including observations, interventions, and recommendations
+                </p>
+                <Textarea
+                  id="narrative"
+                  placeholder="Student was seen for individual therapy session. During the session..."
+                  value={narrativeNotes}
+                  onChange={(e) => setNarrativeNotes(e.target.value)}
+                  className="min-h-[400px]"
+                />
+              </div>
+            ) : (
+              <>
             {/* Subjective */}
             <div>
               <Label
@@ -469,6 +729,8 @@ export function SOAPEditor({
                 className="min-h-[120px]"
               />
             </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

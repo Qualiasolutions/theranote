@@ -1,7 +1,7 @@
 # TheraNote/ThriveSync Platform Roadmap
 
 **Last Updated:** January 2026
-**Overall Progress:** 72% Complete
+**Overall Progress:** 91% Complete
 **Status:** MVP Demo Ready
 
 ---
@@ -10,8 +10,8 @@
 
 | App | Purpose | Status |
 |-----|---------|--------|
-| **TheraNote** | Clinical documentation for therapists | 72% ✅ |
-| **ThriveSync** | Preschool operations management | 85% ✅ |
+| **TheraNote** | Clinical documentation for therapists | 83% ✅ |
+| **ThriveSync** | Preschool operations management | 95% ✅ |
 
 ---
 
@@ -48,29 +48,29 @@ All P0 items are complete. The platform is demo-ready.
 
 ---
 
-## 🔄 IN PROGRESS (P1 - Demo Quality)
+## ✅ COMPLETED (P1 - Demo Quality)
 
-These items enhance demo quality but aren't blockers:
+All P1 items are complete:
 
 | Feature | App | Status | Notes |
 |---------|-----|--------|-------|
-| Make-up session tracking | TheraNote | Not started | Links missed sessions to make-ups |
-| DOE format service log | TheraNote | Not started | NYC-specific export format |
-| AI full note generation | TheraNote | Partial | Currently just prompts |
-| Caseload assignment UI | TheraNote | Not started | Admin assigns therapists to students |
+| Make-up session tracking | TheraNote | ✅ Done | `original_session_id` linking |
+| DOE format service log | TheraNote | ✅ Done | `/api/export/service-log-doe` |
+| AI full note generation | TheraNote | ✅ Done | `/api/ai/generate-note` |
+| Caseload assignment UI | TheraNote | ✅ Done | `/admin/caseloads` page |
+| Narrative format toggle | TheraNote | ✅ Done | SOAP/Narrative switch in editor |
+| Missing element detection | TheraNote | ✅ Done | `/api/ai/analyze-note` |
+| Compliance report exports | ThriveSync | ✅ Done | `/api/export/compliance-overview`, `/api/export/article-47` |
+| Cost allocation reports | ThriveSync | ✅ Done | `/api/export/cost-allocation` |
 
 ---
 
-## 📋 BACKLOG (P2 - Nice to Have)
+## 📋 BACKLOG (P2 - Remaining)
 
 | Feature | App | Priority |
 |---------|-----|----------|
-| Narrative format toggle | TheraNote | P2 |
-| Missing element detection | TheraNote | P2 |
 | Per-therapist admin views | TheraNote | P2 |
 | Weekly report generation | TheraNote | P2 |
-| Compliance report exports | ThriveSync | P2 |
-| Cost allocation reports | ThriveSync | P2 |
 
 ---
 
@@ -121,11 +121,15 @@ theranote/
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
 | `/api/ai/prompts` | POST | Generate SOAP prompts |
+| `/api/ai/generate-note` | POST | Full SOAP/narrative generation |
+| `/api/ai/analyze-note` | POST | Missing element detection |
 | `/api/export/pdf` | GET | PDF progress report |
 | `/api/export/attendance` | GET | Attendance CSV |
 | `/api/export/service-log` | GET | Service log CSV |
+| `/api/export/service-log-doe` | GET | NYC DOE format service log |
 | `/api/export/caseload` | GET | Caseload CSV |
 | `/api/export/progress-report` | GET | Progress CSV |
+| `/api/admin/caseloads` | GET/POST/PUT/DELETE | Caseload management |
 
 ### ThriveSync API
 | Endpoint | Method | Purpose |
@@ -134,6 +138,9 @@ theranote/
 | `/api/export/credentials` | GET | Credential status CSV |
 | `/api/export/attendance` | GET | Staff attendance CSV |
 | `/api/export/expenses` | GET | Expense report CSV |
+| `/api/export/compliance-overview` | GET | All compliance categories |
+| `/api/export/article-47` | GET | Article 47 DOHMH compliance |
+| `/api/export/cost-allocation` | GET | CFR cost allocation report |
 
 ---
 

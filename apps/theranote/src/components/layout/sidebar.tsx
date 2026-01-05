@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -30,6 +31,7 @@ const navigation = [
   { name: 'Sessions', href: '/sessions', icon: FileText },
   { name: 'Incidents', href: '/incidents', icon: AlertCircle },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
+  { name: 'AI Assistant', href: '/assistant', icon: Sparkles },
 ]
 
 const adminNavigation = [

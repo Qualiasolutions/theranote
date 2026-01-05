@@ -12,7 +12,7 @@ import {
   Loader2,
 } from 'lucide-react'
 
-type ReportEndpoint = 'staff-roster' | 'credentials' | 'attendance' | 'expenses' | null
+type ReportEndpoint = 'staff-roster' | 'credentials' | 'attendance' | 'expenses' | 'compliance-overview' | 'article-47' | 'cost-allocation' | null
 
 interface ReportItem {
   name: string
@@ -60,13 +60,13 @@ export default function ReportsPage() {
           name: 'Compliance Overview',
           description: 'All compliance categories',
           icon: ShieldCheck,
-          endpoint: null,
+          endpoint: 'compliance-overview',
         },
         {
           name: 'Article 47 Report',
           description: 'DOHMH compliance status',
           icon: FileText,
-          endpoint: null,
+          endpoint: 'article-47',
         },
         {
           name: 'Audit Binder',
@@ -89,13 +89,13 @@ export default function ReportsPage() {
           name: 'Cost Allocation',
           description: 'Direct vs non-direct costs',
           icon: DollarSign,
-          endpoint: null,
+          endpoint: 'cost-allocation',
         },
         {
           name: 'CFR Summary',
           description: 'Consolidated fiscal report data',
           icon: FileText,
-          endpoint: null,
+          endpoint: 'cost-allocation',
         },
       ],
     },
@@ -136,6 +136,8 @@ export default function ReportsPage() {
       'Staff Credentials': 'credentials',
       'Weekly Summary': 'attendance',
       'Expense Report': 'expenses',
+      'Monthly Compliance': 'compliance-overview',
+      'CFR Data Export': 'cost-allocation',
     }
 
     const endpoint = endpointMap[type]

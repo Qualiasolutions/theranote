@@ -128,6 +128,11 @@ export interface Database {
           last_name: string
           date_of_birth: string
           external_id: string | null
+          osis_number: string | null
+          grade_level: string | null
+          service_type: string | null
+          iep_start_date: string | null
+          iep_end_date: string | null
           status: 'active' | 'discharged' | 'on_hold'
           settings: Json
           created_at: string
@@ -141,6 +146,11 @@ export interface Database {
           last_name: string
           date_of_birth: string
           external_id?: string | null
+          osis_number?: string | null
+          grade_level?: string | null
+          service_type?: string | null
+          iep_start_date?: string | null
+          iep_end_date?: string | null
           status?: 'active' | 'discharged' | 'on_hold'
           settings?: Json
           created_at?: string
@@ -154,6 +164,11 @@ export interface Database {
           last_name?: string
           date_of_birth?: string
           external_id?: string | null
+          osis_number?: string | null
+          grade_level?: string | null
+          service_type?: string | null
+          iep_start_date?: string | null
+          iep_end_date?: string | null
           status?: 'active' | 'discharged' | 'on_hold'
           settings?: Json
           created_at?: string
@@ -255,6 +270,9 @@ export interface Database {
           status: 'draft' | 'signed' | 'locked' | 'amended'
           signed_at: string | null
           signature_data: Json | null
+          original_session_id: string | null
+          note_format: 'soap' | 'narrative'
+          narrative_notes: string | null
           created_at: string
           updated_at: string
         }
@@ -275,6 +293,9 @@ export interface Database {
           status?: 'draft' | 'signed' | 'locked' | 'amended'
           signed_at?: string | null
           signature_data?: Json | null
+          original_session_id?: string | null
+          note_format?: 'soap' | 'narrative'
+          narrative_notes?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -295,6 +316,9 @@ export interface Database {
           status?: 'draft' | 'signed' | 'locked' | 'amended'
           signed_at?: string | null
           signature_data?: Json | null
+          original_session_id?: string | null
+          note_format?: 'soap' | 'narrative'
+          narrative_notes?: string | null
           created_at?: string
           updated_at?: string
         }
