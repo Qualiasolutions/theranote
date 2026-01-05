@@ -1,202 +1,162 @@
-# TheraNote Development Roadmap
+# TheraNote/ThriveSync Platform Roadmap
 
-## Overview
-
-TheraNote is an AI-assisted clinical documentation platform for preschool special-education programs (4410, early intervention, CPSE). This document tracks feature status and upcoming development priorities.
-
-## Current Status: **MVP Complete**
-
-Last Updated: January 2026
+**Last Updated:** January 2026
+**Overall Progress:** 72% Complete
+**Status:** MVP Demo Ready
 
 ---
 
-## Feature Completion Matrix
+## Platform Overview
 
-### Core Features
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| User Authentication | ✅ Complete | 100% | Supabase Auth with role-based access |
-| Multi-tenant Organizations | ✅ Complete | 100% | Org/site/user hierarchy |
-| Student Management | ✅ Complete | 100% | Full CRUD, demographics, IEP tracking |
-| Session Notes (SOAP) | ✅ Complete | 100% | Multi-section editor with validation |
-| Session Templates | ✅ Complete | 100% | 7 disciplines supported |
-| Goal/IEP Tracking | ✅ Complete | 100% | Goals linked to sessions |
-| Progress Tracking | ✅ Complete | 100% | Per-session goal progress data |
-| Behavior Incidents | ✅ Complete | 100% | ABC format with notifications |
-| Caseload Management | ✅ Complete | 100% | Therapist-student assignments |
-
-### AI Features
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| AI-Assisted SOAP Notes | ✅ Complete | 100% | Context-aware prompts |
-| Smart Prompts by Discipline | ✅ Complete | 100% | 7 disciplines with section-specific |
-| Clinical Language Suggestions | ✅ Complete | 100% | OpenRouter (Gemini Flash) |
-| Context-Aware AI | ✅ Complete | 100% | Student name, goals, previous content |
-
-### Reports & Exports
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| Attendance Report | ✅ Complete | 100% | CSV export with date range |
-| Service Log Report | ✅ Complete | 100% | NYC DOE format CSV |
-| Caseload Summary | ✅ Complete | 100% | Student metrics CSV |
-| Progress Report | ✅ Complete | 100% | Goal progress analysis CSV |
-| Compliance Dashboard | ✅ Complete | 100% | Real-time compliance scoring |
-
-### Compliance
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| 7-Day Signing Requirement | ✅ Complete | 100% | Alerts for overdue/due soon |
-| SOAP Completeness Check | ✅ Complete | 100% | Missing section detection |
-| Compliance Alerts Dashboard | ✅ Complete | 100% | Score + violation list |
-| Pre-Sign Validation | ✅ Complete | 100% | Required field enforcement |
-
-### Admin Features
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| User Management | ✅ Complete | 100% | View, delete team members |
-| Invitation System | ✅ Complete | 100% | Create, revoke invitations |
-| Organization Settings | ✅ Complete | 100% | Basic org configuration |
-| Audit Logging | ✅ Complete | 100% | Action tracking |
-
-### UI/UX
-
-| Feature | Status | Completion | Notes |
-|---------|--------|------------|-------|
-| Responsive Design | ✅ Complete | 100% | Mobile/tablet/desktop |
-| Premium Animations | ✅ Complete | 100% | Framer Motion throughout |
-| Dark Sidebar | ✅ Complete | 100% | Modern navigation |
-| Glassmorphism Effects | ✅ Complete | 100% | Cards, header |
+| App | Purpose | Status |
+|-----|---------|--------|
+| **TheraNote** | Clinical documentation for therapists | 72% ✅ |
+| **ThriveSync** | Preschool operations management | 85% ✅ |
 
 ---
 
-## Upcoming Features (Prioritized)
+## ✅ COMPLETED (P0 - Ship Blockers)
 
-### Phase 5: PWA & Offline (Priority: Medium)
-*Target: Future Sprint*
+All P0 items are complete. The platform is demo-ready.
 
-| Task | Status | Notes |
-|------|--------|-------|
-| PWA Manifest | ⬜ Not Started | TheraNote branding |
-| Service Worker | ⬜ Not Started | Offline caching |
-| IndexedDB Storage | ⬜ Not Started | Local session storage |
-| Background Sync | ⬜ Not Started | Reconnection handling |
-| Offline Indicator | ⬜ Not Started | UI feedback |
+### TheraNote
+- [x] Authentication & multi-tenancy (Supabase Auth + RLS)
+- [x] SOAP note editor with AI prompts
+- [x] Goal/IEP tracking with progress data
+- [x] **Progress graphs** (Recharts: LineChart, AreaChart)
+- [x] **PDF export** (`/api/export/pdf` with @react-pdf/renderer)
+- [x] CSV exports (attendance, service-log, caseload, progress-report)
+- [x] Behavior incident tracking (ABC format)
+- [x] Compliance engine (7-day signing, SOAP validation)
+- [x] Admin dashboard with user management
 
-### Phase 6: Email Integration (Priority: Low)
-*Requires: Resend API setup*
+### ThriveSync
+- [x] Staff management with credential tracking
+- [x] Classroom management with ratio monitoring
+- [x] Finance module (expenses, allocations)
+- [x] Family communication portal
+- [x] Compliance dashboard (Article 47, DOHMH, NYSED)
+- [x] **Dashboard with real Supabase data**
+- [x] **CSV exports** (staff-roster, credentials, attendance, expenses)
+- [x] **Reports page wired to export endpoints**
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Email Service Setup | ⬜ Not Started | Resend integration |
-| Invitation Emails | ⬜ Not Started | Send on invite create |
-| Compliance Alerts Email | ⬜ Not Started | Daily digest option |
-| Session Reminder Emails | ⬜ Not Started | Configurable |
-
-### Phase 7: Advanced Features
-
-| Task | Status | Notes |
-|------|--------|-------|
-| PDF Report Export | ⬜ Not Started | Progress reports |
-| Goal Templates Library | ⬜ Not Started | Pre-built IEP goals |
-| Session Scheduling | ⬜ Not Started | Calendar integration |
-| Parent Portal | ⬜ Not Started | Read-only access |
-| Two-Factor Authentication | ⬜ Not Started | Enhanced security |
+### Infrastructure
+- [x] Turborepo monorepo with pnpm workspaces
+- [x] Vercel deployment (https://theranote-delta.vercel.app)
+- [x] Shared packages (@repo/ui, @repo/database, @repo/auth)
+- [x] TypeScript throughout
 
 ---
 
-## Technical Debt
+## 🔄 IN PROGRESS (P1 - Demo Quality)
 
-| Item | Priority | Notes |
-|------|----------|-------|
-| ~~Remove Gemini dependency~~ | ✅ Done | Switched to OpenRouter |
-| Add proper error boundaries | Medium | React error handling |
-| Implement rate limiting | Medium | API protection |
-| Review RLS policies | Low | Security audit |
-| Add E2E tests | Low | Playwright testing |
+These items enhance demo quality but aren't blockers:
+
+| Feature | App | Status | Notes |
+|---------|-----|--------|-------|
+| Make-up session tracking | TheraNote | Not started | Links missed sessions to make-ups |
+| DOE format service log | TheraNote | Not started | NYC-specific export format |
+| AI full note generation | TheraNote | Partial | Currently just prompts |
+| Caseload assignment UI | TheraNote | Not started | Admin assigns therapists to students |
 
 ---
 
-## Architecture Notes
+## 📋 BACKLOG (P2 - Nice to Have)
 
-### Tech Stack
-- **Framework**: Next.js 15.5 (App Router, React 19, TypeScript)
-- **Database**: Supabase (PostgreSQL + Auth + RLS)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Animation**: Motion (Framer Motion)
-- **AI**: OpenRouter API (google/gemini-flash-1.5)
-- **Deployment**: Vercel
+| Feature | App | Priority |
+|---------|-----|----------|
+| Narrative format toggle | TheraNote | P2 |
+| Missing element detection | TheraNote | P2 |
+| Per-therapist admin views | TheraNote | P2 |
+| Weekly report generation | TheraNote | P2 |
+| Compliance report exports | ThriveSync | P2 |
+| Cost allocation reports | ThriveSync | P2 |
 
-### Key Directories
+---
+
+## 🔮 FUTURE PHASES (P3+)
+
+### Phase 2: Advanced Features
+- Parent notification letter generation
+- Medicaid billing format export
+- Audit log viewer with filtering
+- Progress report AI summarization
+
+### Phase 3: Parent Portal
+- Parent-accessible session views
+- Consent/permission tracking
+- Home communication log
+
+### Phase 4: Offline/PWA
+- Service worker for offline
+- IndexedDB local storage
+- Background sync
+
+---
+
+## File Structure
+
 ```
-src/
-├── app/                 # Next.js App Router pages
-│   ├── (auth)/         # Authentication pages
-│   ├── (dashboard)/    # Protected app pages
-│   └── api/            # API routes
-├── components/
-│   ├── admin/          # Admin components
-│   ├── compliance/     # Compliance alerts
-│   ├── layout/         # Header, sidebar
-│   ├── sessions/       # SOAP editor, AI prompts
-│   └── ui/             # shadcn/ui components
-└── lib/
-    ├── ai/             # OpenRouter integration
-    ├── compliance/     # Rules engine
-    └── supabase/       # Database clients
+theranote/
+├── apps/
+│   ├── theranote/          # Clinical documentation app
+│   │   ├── src/app/        # Next.js App Router pages
+│   │   ├── src/components/ # React components
+│   │   └── src/lib/        # Utilities (supabase, ai, compliance)
+│   └── thrivesync/         # Operations management app
+│       ├── src/app/        # Next.js App Router pages
+│       └── src/components/ # React components
+├── packages/
+│   ├── database/           # Shared Supabase types
+│   ├── ui/                 # Shared UI components
+│   └── auth/               # Shared auth utilities
+└── turbo.json              # Turborepo config
 ```
 
-### Database Schema
-- `organizations` - Multi-tenant root
-- `profiles` - User accounts
-- `students` - Children receiving services
-- `sessions` - SOAP documentation
-- `goals` - IEP/IFSP goals
-- `session_goals` - Progress per session
-- `incidents` - Behavior documentation
-- `caseloads` - Therapist assignments
-- `invitations` - User invitations
-- `audit_logs` - Activity tracking
-
 ---
 
-## API Endpoints
+## Key Endpoints
 
+### TheraNote API
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/ai/prompts` | POST | Generate AI SOAP prompts |
+| `/api/ai/prompts` | POST | Generate SOAP prompts |
+| `/api/export/pdf` | GET | PDF progress report |
 | `/api/export/attendance` | GET | Attendance CSV |
 | `/api/export/service-log` | GET | Service log CSV |
-| `/api/export/caseload` | GET | Caseload summary CSV |
-| `/api/export/progress-report` | GET | Progress report CSV |
-| `/api/admin/users/[id]` | DELETE | Remove team member |
-| `/api/admin/invitations/[id]` | DELETE | Revoke invitation |
+| `/api/export/caseload` | GET | Caseload CSV |
+| `/api/export/progress-report` | GET | Progress CSV |
+
+### ThriveSync API
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/export/staff-roster` | GET | Staff list CSV |
+| `/api/export/credentials` | GET | Credential status CSV |
+| `/api/export/attendance` | GET | Staff attendance CSV |
+| `/api/export/expenses` | GET | Expense report CSV |
 
 ---
 
-## Environment Variables
+## Quick Start
 
 ```bash
-# Required
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-OPENROUTER_API_KEY=your-openrouter-key
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Install dependencies
+pnpm install
 
-# Optional (for future features)
-RESEND_API_KEY=for-email-integration
+# Run both apps
+pnpm dev
+
+# Run specific app
+pnpm dev:theranote
+pnpm dev:thrivesync
+
+# Build
+pnpm build
+
+# Deploy
+vercel --prod
 ```
 
 ---
 
-## Contributing
-
-See `CLAUDE.md` for development guidelines and project context.
-
----
-
-*Built by Qualia Solutions*
+*Generated by Qualia Solutions - January 2026*
