@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { Target, ChevronDown, ChevronUp, Check, Pause, X } from 'lucide-react'
+import { Target, ChevronDown, ChevronUp, Check, Pause, X, BarChart3 } from 'lucide-react'
+import { ProgressChart } from './progress-chart'
 
 interface Goal {
   id: string
@@ -210,6 +211,21 @@ export function GoalsList({ goals, studentId }: GoalsListProps) {
                       Discontinue
                     </Button>
                   )}
+                </div>
+
+                {/* Progress Chart */}
+                <div className="pt-4 mt-4 border-t">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <h4 className="text-sm font-medium">Progress Over Time</h4>
+                  </div>
+                  <ProgressChart
+                    goalId={goal.id}
+                    studentId={studentId}
+                    title={goal.description}
+                    baseline={goal.baseline}
+                    targetCriteria={goal.target_criteria}
+                  />
                 </div>
               </div>
             </div>
