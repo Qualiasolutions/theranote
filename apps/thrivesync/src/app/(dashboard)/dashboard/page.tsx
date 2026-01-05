@@ -3,18 +3,18 @@ import { Header } from '@/components/layout/header'
 import Link from 'next/link'
 import {
   Users,
-  School,
-  AlertTriangle,
-  CheckCircle,
+  Building,
+  AlertCircle,
+  Check,
   Clock,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react'
 import type { Profile, StaffCredential, ComplianceItem, ComplianceEvidence } from '@repo/database'
 import { getDaysUntil } from '@/lib/utils'
 
-// Category definitions for compliance scores
 const complianceCategories = ['hr', 'article_47', 'dohmh', 'nysed'] as const
 
-// Calculate if ratio is met
 function calculateRatioMet(
   staffCount: number,
   studentCount: number,
@@ -42,20 +42,15 @@ function calculateRatioMet(
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  // ========== STATS CARDS ==========
-
-  // Total Staff: Count profiles (all roles are staff in ThriveSync context)
   const { count: staffCount } = await supabase
     .from('profiles')
     .select('*', { count: 'exact', head: true })
 
-  // Active Students
   const { count: studentCount } = await supabase
     .from('students')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active')
 
-  // Compliance Score: Calculate from compliance_items and compliance_evidence
   const { data: complianceItemsRaw } = await supabase
     .from('compliance_items')
     .select('*')
@@ -69,7 +64,6 @@ export default async function DashboardPage() {
 
   const evidence = (evidenceRaw || []) as ComplianceEvidence[]
 
-  // Calculate overall compliance score
   const totalItems = complianceItems.length
   const compliantItems = complianceItems.filter((item) => {
     const itemEvidence = evidence.find(
@@ -83,22 +77,18 @@ export default async function DashboardPage() {
   }).length
   const complianceScore = totalItems > 0 ? Math.round((compliantItems / totalItems) * 100) : 100
 
-  // Pending Alerts: Count from compliance_alerts where not resolved
   const { count: alertCount } = await supabase
     .from('compliance_alerts')
     .select('*', { count: 'exact', head: true })
     .eq('resolved', false)
 
   const stats = [
-    { name: 'Total Staff', value: staffCount || 0, icon: Users, color: 'bg-blue-500' },
-    { name: 'Active Students', value: studentCount || 0, icon: School, color: 'bg-green-500' },
-    { name: 'Compliance Score', value: `${complianceScore}%`, icon: CheckCircle, color: 'bg-purple-500' },
-    { name: 'Pending Alerts', value: alertCount || 0, icon: AlertTriangle, color: 'bg-amber-500' },
+    { name: 'Total Staff', value: staffCount || 0, icon: Users, change: 'Team members' },
+    { name: 'Active Students', value: studentCount || 0, icon: Building, change: 'Enrolled' },
+    { name: 'Compliance', value: `${complianceScore}%`, icon: TrendingUp, change: complianceScore >= 90 ? 'On track' : 'Needs attention' },
+    { name: 'Alerts', value: alertCount || 0, icon: AlertCircle, change: (alertCount || 0) > 0 ? 'Action needed' : 'All clear' },
   ]
 
-  // ========== CREDENTIAL ALERTS ==========
-
-  // Fetch all staff with their credentials
   const { data: staffWithCredentialsRaw } = await supabase
     .from('profiles')
     .select(`
@@ -110,7 +100,6 @@ export default async function DashboardPage() {
   type ProfileWithCredentials = Profile & { staff_credentials: StaffCredential[] }
   const staffWithCredentials = (staffWithCredentialsRaw as unknown as ProfileWithCredentials[]) || []
 
-  // Categorize credentials by status
   const now = new Date()
   const credentialAlerts: {
     expired: { staffName: string; credentialType: string; daysOverdue: number }[]
@@ -118,8 +107,8 @@ export default async function DashboardPage() {
     expiringLater: { staffName: string; credentialType: string; daysUntil: number }[]
   } = {
     expired: [],
-    expiringSoon: [], // within 30 days
-    expiringLater: [], // 30-90 days
+    expiringSoon: [],
+    expiringLater: [],
   }
 
   staffWithCredentials.forEach((staff) => {
@@ -152,14 +141,10 @@ export default async function DashboardPage() {
     })
   })
 
-  // Sort by urgency
   credentialAlerts.expired.sort((a, b) => b.daysOverdue - a.daysOverdue)
   credentialAlerts.expiringSoon.sort((a, b) => a.daysUntil - b.daysUntil)
   credentialAlerts.expiringLater.sort((a, b) => a.daysUntil - b.daysUntil)
 
-  // ========== CLASSROOM STATUS ==========
-
-  // Fetch classrooms with assignments and staff
   const { data: classroomsRaw } = await supabase
     .from('classrooms')
     .select(`
@@ -195,8 +180,6 @@ export default async function DashboardPage() {
     }
   })
 
-  // ========== COMPLIANCE BY CATEGORY ==========
-
   const categoryStats = complianceCategories.map((category) => {
     const categoryItems = complianceItems.filter((item) => item.category === category)
     const categoryTotal = categoryItems.length
@@ -231,144 +214,136 @@ export default async function DashboardPage() {
     <>
       <Header
         title="Dashboard"
-        subtitle="Operations & Compliance Overview"
+        subtitle="Operations overview"
       />
 
       <div className="p-6 space-y-6">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
             <div
               key={stat.name}
-              className="relative overflow-hidden rounded-xl bg-white p-6 shadow-sm border"
+              className="stat-card group transition-all duration-200"
             >
-              <div className="flex items-center gap-4">
-                <div className={`rounded-lg ${stat.color} p-3`}>
-                  <stat.icon className="h-6 w-6 text-white" />
-                </div>
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-[13px] font-medium text-muted-foreground">{stat.name}</p>
+                  <p className="text-2xl font-semibold tracking-tight mt-1">{stat.value}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-muted transition-colors">
+                  <stat.icon className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mt-3">{stat.change}</p>
             </div>
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Credential Alerts */}
-          <div className="rounded-xl bg-white p-6 shadow-sm border">
+          <div className="stat-card">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Credential Alerts</h3>
-              <Link href="/staff" className="text-sm text-purple-600 hover:text-purple-700">
-                View All
+              <h3 className="text-sm font-semibold">Credential Status</h3>
+              <Link href="/staff" className="text-xs text-primary hover:underline flex items-center gap-1">
+                View all <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {credentialAlerts.expired.length > 0 ? (
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
                   <div>
-                    <p className="font-medium text-red-800">
-                      {credentialAlerts.expired.length} credential{credentialAlerts.expired.length !== 1 ? 's' : ''} expired
+                    <p className="text-sm font-medium text-red-800">
+                      {credentialAlerts.expired.length} expired
                     </p>
-                    <p className="text-sm text-red-600">
+                    <p className="text-xs text-red-600 mt-0.5">
                       {credentialAlerts.expired.slice(0, 2).map(c => c.staffName).join(', ')}
-                      {credentialAlerts.expired.length > 2 ? ` +${credentialAlerts.expired.length - 2} more` : ''}
+                      {credentialAlerts.expired.length > 2 ? ` +${credentialAlerts.expired.length - 2}` : ''}
                     </p>
                   </div>
-                  <span className="text-xs font-medium text-red-700 bg-red-100 px-2 py-1 rounded">Critical</span>
+                  <span className="badge-premium badge-error">Critical</span>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-100">
                   <div>
-                    <p className="font-medium text-green-800">No expired credentials</p>
-                    <p className="text-sm text-green-600">All credentials are current</p>
+                    <p className="text-sm font-medium text-emerald-800">No expired credentials</p>
+                    <p className="text-xs text-emerald-600 mt-0.5">All credentials current</p>
                   </div>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <Check className="h-4 w-4 text-emerald-500" />
                 </div>
               )}
 
               {credentialAlerts.expiringSoon.length > 0 ? (
                 <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
                   <div>
-                    <p className="font-medium text-amber-800">
+                    <p className="text-sm font-medium text-amber-800">
                       {credentialAlerts.expiringSoon.length} expiring in 30 days
                     </p>
-                    <p className="text-sm text-amber-600">
+                    <p className="text-xs text-amber-600 mt-0.5">
                       {credentialAlerts.expiringSoon.slice(0, 2).map(c => c.staffName).join(', ')}
-                      {credentialAlerts.expiringSoon.length > 2 ? ` +${credentialAlerts.expiringSoon.length - 2} more` : ''}
                     </p>
                   </div>
-                  <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">Warning</span>
+                  <span className="badge-premium badge-warning">Warning</span>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-black/[0.04]">
                   <div>
-                    <p className="font-medium text-gray-700">No credentials expiring soon</p>
-                    <p className="text-sm text-gray-500">Nothing due in the next 30 days</p>
+                    <p className="text-sm font-medium text-foreground">No upcoming expirations</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Next 30 days clear</p>
                   </div>
-                  <Clock className="h-5 w-5 text-gray-400" />
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                 </div>
               )}
 
-              {credentialAlerts.expiringLater.length > 0 ? (
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+              {credentialAlerts.expiringLater.length > 0 && (
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-black/[0.04]">
                   <div>
-                    <p className="font-medium text-blue-800">
+                    <p className="text-sm font-medium text-foreground">
                       {credentialAlerts.expiringLater.length} expiring in 90 days
                     </p>
-                    <p className="text-sm text-blue-600">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {credentialAlerts.expiringLater.slice(0, 2).map(c => c.staffName).join(', ')}
-                      {credentialAlerts.expiringLater.length > 2 ? ` +${credentialAlerts.expiringLater.length - 2} more` : ''}
                     </p>
                   </div>
-                  <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded">Info</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <div>
-                    <p className="font-medium text-gray-700">No upcoming expirations</p>
-                    <p className="text-sm text-gray-500">Nothing due in the next 90 days</p>
-                  </div>
-                  <Clock className="h-5 w-5 text-gray-400" />
+                  <span className="badge-premium badge-neutral">Info</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Ratio Status */}
-          <div className="rounded-xl bg-white p-6 shadow-sm border">
+          {/* Classroom Ratios */}
+          <div className="stat-card">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Classroom Ratios</h3>
-              <Link href="/classrooms" className="text-sm text-purple-600 hover:text-purple-700">
-                View All
+              <h3 className="text-sm font-semibold">Classroom Ratios</h3>
+              <Link href="/classrooms" className="text-xs text-primary hover:underline flex items-center gap-1">
+                View all <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {classroomStatus.length > 0 ? (
                 classroomStatus.map((room) => (
-                  <div key={room.id} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
-                      {room.name} ({room.roomType})
-                    </span>
+                  <div key={room.id} className="flex items-center justify-between py-2">
+                    <div>
+                      <span className="text-sm font-medium text-foreground">{room.name}</span>
+                      <span className="text-xs text-muted-foreground ml-2">({room.roomType})</span>
+                    </div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm font-medium ${room.ratioMet ? 'text-gray-900' : 'text-amber-600'}`}>
+                      <span className={`text-sm font-medium ${room.ratioMet ? 'text-foreground' : 'text-amber-600'}`}>
                         {room.ratio}
                       </span>
                       {room.ratioMet ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Check className="h-4 w-4 text-emerald-500" />
                       ) : (
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                        <AlertCircle className="h-4 w-4 text-amber-500" />
                       )}
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-gray-500">
-                  <School className="h-8 w-8 mx-auto text-gray-300 mb-2" />
-                  <p className="text-sm">No active classrooms</p>
-                  <Link href="/classrooms" className="text-sm text-purple-600 hover:text-purple-700">
+                <div className="text-center py-8">
+                  <Building className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
+                  <p className="text-sm text-muted-foreground">No active classrooms</p>
+                  <Link href="/classrooms" className="text-xs text-primary hover:underline mt-1 inline-block">
                     Add Classroom
                   </Link>
                 </div>
@@ -378,36 +353,36 @@ export default async function DashboardPage() {
         </div>
 
         {/* Compliance Overview */}
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
+        <div className="stat-card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Compliance Overview</h3>
-            <Link href="/compliance" className="text-sm text-purple-600 hover:text-purple-700">
-              View Details
+            <h3 className="text-sm font-semibold">Compliance by Category</h3>
+            <Link href="/compliance" className="text-xs text-primary hover:underline flex items-center gap-1">
+              View details <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {categoryStats.map((cat) => (
               <Link
                 key={cat.category}
                 href={`/compliance/${cat.category}`}
-                className={`text-center p-4 rounded-lg transition-colors ${
+                className={`text-center p-4 rounded-lg transition-colors border ${
                   cat.score >= 90
-                    ? 'bg-green-50 hover:bg-green-100'
+                    ? 'bg-emerald-50 border-emerald-100 hover:bg-emerald-100'
                     : cat.score >= 70
-                      ? 'bg-amber-50 hover:bg-amber-100'
-                      : 'bg-red-50 hover:bg-red-100'
+                      ? 'bg-amber-50 border-amber-100 hover:bg-amber-100'
+                      : 'bg-red-50 border-red-100 hover:bg-red-100'
                 }`}
               >
-                <p className={`text-3xl font-bold ${
+                <p className={`text-2xl font-semibold ${
                   cat.score >= 90
-                    ? 'text-green-600'
+                    ? 'text-emerald-700'
                     : cat.score >= 70
-                      ? 'text-amber-600'
-                      : 'text-red-600'
+                      ? 'text-amber-700'
+                      : 'text-red-700'
                 }`}>
                   {cat.score}%
                 </p>
-                <p className="text-sm text-gray-600">{cat.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">{cat.name}</p>
               </Link>
             ))}
           </div>
