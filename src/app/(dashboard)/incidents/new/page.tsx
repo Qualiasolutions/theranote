@@ -14,6 +14,15 @@ export default async function NewIncidentPage() {
     redirect('/login')
   }
 
+  // Get user's organization
+  const { data: userOrg } = await supabase
+    .from('user_organizations')
+    .select('org_id')
+    .eq('user_id', user.id)
+    .single() as { data: { org_id: string } | null }
+
+  const organizationId = userOrg?.org_id || ''
+
   // Get students on caseload
   const { data: caseloads } = await supabase
     .from('caseloads')
@@ -44,7 +53,7 @@ export default async function NewIncidentPage() {
           <CardTitle>Incident Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <IncidentForm students={students} reporterId={user.id} />
+          <IncidentForm students={students} reporterId={user.id} organizationId={organizationId} />
         </CardContent>
       </Card>
     </div>

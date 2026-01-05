@@ -77,10 +77,15 @@ export default async function AttendanceReportPage() {
           <h2 className="text-2xl font-bold">Attendance Log</h2>
           <p className="text-muted-foreground">{monthName}</p>
         </div>
-        <Button>
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <a
+          href={`/api/export/attendance?startDate=${startOfMonth.toISOString().split('T')[0]}&endDate=${endOfMonth.toISOString().split('T')[0]}`}
+          download
+        >
+          <Button>
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+        </a>
       </div>
 
       {/* Summary Stats */}

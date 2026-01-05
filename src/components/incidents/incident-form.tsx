@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,6 +18,7 @@ interface Student {
 interface IncidentFormProps {
   students: Student[]
   reporterId: string
+  organizationId: string
 }
 
 const INCIDENT_TYPES = [
@@ -35,9 +37,11 @@ const SEVERITY_LEVELS = [
   { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700' },
 ]
 
-export function IncidentForm({ students, reporterId }: IncidentFormProps) {
+export function IncidentForm({ students, reporterId, organizationId }: IncidentFormProps) {
   const router = useRouter()
+  const supabase = createClient()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Form state
   const [studentId, setStudentId] = useState('')
@@ -60,24 +64,60 @@ export function IncidentForm({ students, reporterId }: IncidentFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
 
     if (!studentId || !incidentType || !description) {
-      alert('Please fill in all required fields')
+      setError('Please fill in all required fields')
       return
     }
 
     setLoading(true)
 
-    // For now, just show success - would save to incidents table
-    // In production, this would call an API endpoint or Supabase insert
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      const { error: insertError } = await (supabase
+        .from('incidents') as ReturnType<typeof supabase.from>)
+        .insert({
+          student_id: studentId,
+          reporter_id: reporterId,
+          organization_id: organizationId,
+          incident_type: incidentType,
+          severity,
+          incident_date: incidentDate,
+          incident_time: incidentTime,
+          location: location || null,
+          description,
+          antecedent: antecedent || null,
+          behavior: behavior || null,
+          consequence: consequence || null,
+          interventions: interventions || null,
+          outcome: outcome || null,
+          parent_notified: parentNotified,
+          admin_notified: adminNotified,
+          follow_up_required: followUpRequired,
+        } as never)
 
-    alert('Incident report saved successfully')
-    router.push('/incidents')
+      if (insertError) {
+        throw insertError
+      }
+
+      router.push('/incidents')
+      router.refresh()
+    } catch (err) {
+      console.error('Error saving incident:', err)
+      setError('Failed to save incident. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+          {error}
+        </div>
+      )}
+
       {/* Basic Info */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="md:col-span-2">

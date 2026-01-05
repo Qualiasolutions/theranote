@@ -168,15 +168,33 @@ export function AIPromptsPanel({
 
   const generateCustomPrompts = async () => {
     setLoading(true)
-    // Simulate AI call - in production, this would call the /api/ai/prompt endpoint
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const response = await fetch('/api/ai/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discipline,
+          section: activeSection,
+        }),
+      })
 
-    setCustomPrompts([
-      `Based on ${discipline} therapy best practices...`,
-      `Consider documenting progress on...`,
-      `Clinical observation suggests...`,
-    ])
-    setLoading(false)
+      if (!response.ok) {
+        throw new Error('Failed to generate prompts')
+      }
+
+      const data = await response.json()
+      setCustomPrompts(data.prompts || [])
+    } catch (error) {
+      console.error('Error generating prompts:', error)
+      // Fallback to static prompts on error
+      setCustomPrompts([
+        `Based on ${discipline} therapy best practices...`,
+        `Consider documenting progress on...`,
+        `Clinical observation suggests...`,
+      ])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

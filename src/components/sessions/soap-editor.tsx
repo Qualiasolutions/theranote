@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { AIPromptsPanel } from './ai-prompts-panel'
+import { GoalProgressTracker } from './goal-progress-tracker'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2, Save, CheckCircle, Sparkles } from 'lucide-react'
 
@@ -51,6 +52,23 @@ export function SOAPEditor({
   const [activeSection, setActiveSection] = useState<'S' | 'O' | 'A' | 'P'>('S')
   const [showAIPanel, setShowAIPanel] = useState(true)
 
+  // Goals state
+  interface Goal {
+    id: string
+    description: string
+    domain: string | null
+    target_criteria: string | null
+    status: string
+  }
+  interface GoalProgress {
+    goalId: string
+    progressValue: number | null
+    progressUnit: string
+    notes: string
+  }
+  const [goals, setGoals] = useState<Goal[]>([])
+  const [goalProgress, setGoalProgress] = useState<GoalProgress[]>([])
+
   // Form state
   const [studentId, setStudentId] = useState(existingSession?.student_id || '')
   const [sessionDate, setSessionDate] = useState(
@@ -67,6 +85,72 @@ export function SOAPEditor({
   const [plan, setPlan] = useState(existingSession?.plan || '')
 
   const selectedStudent = students.find((s) => s.id === studentId)
+
+  // Load goals when student changes
+  useEffect(() => {
+    const loadGoals = async () => {
+      if (!studentId) {
+        setGoals([])
+        setGoalProgress([])
+        return
+      }
+
+      // Get active goals for the student
+      const { data: studentGoals } = await supabase
+        .from('goals')
+        .select('id, description, domain, target_criteria, status')
+        .eq('student_id', studentId)
+        .in('status', ['baseline', 'in_progress'])
+        .order('created_at', { ascending: false })
+
+      setGoals((studentGoals as Goal[]) || [])
+
+      // If editing existing session, load progress data
+      if (existingSession) {
+        const { data: sessionGoals } = await supabase
+          .from('session_goals')
+          .select('goal_id, progress_value, progress_unit, notes')
+          .eq('session_id', existingSession.id)
+
+        if (sessionGoals) {
+          setGoalProgress(
+            sessionGoals.map((sg: { goal_id: string; progress_value: number | null; progress_unit: string | null; notes: string | null }) => ({
+              goalId: sg.goal_id,
+              progressValue: sg.progress_value,
+              progressUnit: sg.progress_unit || '%',
+              notes: sg.notes || '',
+            }))
+          )
+        }
+      }
+    }
+
+    loadGoals()
+  }, [studentId, existingSession, supabase])
+
+  const saveGoalProgress = async (sessionId: string) => {
+    // Delete existing progress for this session
+    await supabase
+      .from('session_goals')
+      .delete()
+      .eq('session_id', sessionId)
+
+    // Insert new progress data
+    const progressToSave = goalProgress.filter(p => p.progressValue !== null || p.notes)
+    if (progressToSave.length > 0) {
+      await (supabase
+        .from('session_goals') as ReturnType<typeof supabase.from>)
+        .insert(
+          progressToSave.map(p => ({
+            session_id: sessionId,
+            goal_id: p.goalId,
+            progress_value: p.progressValue,
+            progress_unit: p.progressUnit,
+            notes: p.notes || null,
+          })) as never
+        )
+    }
+  }
 
   const handleSaveDraft = async () => {
     if (!studentId) {
@@ -91,6 +175,8 @@ export function SOAPEditor({
       status: 'draft' as const,
     }
 
+    let sessionId = existingSession?.id
+
     if (existingSession) {
       const { error } = await (supabase
         .from('sessions') as ReturnType<typeof supabase.from>)
@@ -103,15 +189,23 @@ export function SOAPEditor({
         return
       }
     } else {
-      const { error } = await (supabase
+      const { data, error } = await (supabase
         .from('sessions') as ReturnType<typeof supabase.from>)
         .insert(sessionData as never)
+        .select('id')
+        .single()
 
       if (error) {
         alert('Error saving: ' + error.message)
         setLoading(false)
         return
       }
+      sessionId = (data as { id: string }).id
+    }
+
+    // Save goal progress
+    if (sessionId) {
+      await saveGoalProgress(sessionId)
     }
 
     setLoading(false)
@@ -143,6 +237,8 @@ export function SOAPEditor({
       signed_at: new Date().toISOString(),
     }
 
+    let sessionId = existingSession?.id
+
     if (existingSession) {
       const { error } = await (supabase
         .from('sessions') as ReturnType<typeof supabase.from>)
@@ -155,15 +251,23 @@ export function SOAPEditor({
         return
       }
     } else {
-      const { error } = await (supabase
+      const { data, error } = await (supabase
         .from('sessions') as ReturnType<typeof supabase.from>)
         .insert(sessionData as never)
+        .select('id')
+        .single()
 
       if (error) {
         alert('Error signing: ' + error.message)
         setLoading(false)
         return
       }
+      sessionId = (data as { id: string }).id
+    }
+
+    // Save goal progress
+    if (sessionId) {
+      await saveGoalProgress(sessionId)
     }
 
     setLoading(false)
@@ -392,9 +496,19 @@ export function SOAPEditor({
         </div>
       </div>
 
-      {/* AI Panel */}
+      {/* Right Panel: Goals & AI */}
       {showAIPanel && (
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
+          {/* Goal Progress Tracker */}
+          {studentId && (
+            <GoalProgressTracker
+              goals={goals}
+              progress={goalProgress}
+              onProgressChange={setGoalProgress}
+            />
+          )}
+
+          {/* AI Prompts */}
           <AIPromptsPanel
             discipline={selectedStudent?.discipline || discipline}
             activeSection={activeSection}
