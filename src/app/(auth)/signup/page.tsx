@@ -236,14 +236,7 @@ export default function SignupPage() {
               transition={{ delay: 0.45 }}
               className="text-xs text-muted-foreground/70 text-center"
             >
-              By creating an account, you agree to our{' '}
-              <Link href="/terms" className="underline hover:text-primary">
-                Terms of Service
-              </Link>{' '}
-              and{' '}
-              <Link href="/privacy" className="underline hover:text-primary">
-                Privacy Policy
-              </Link>
+              By creating an account, you agree to our Terms of Service and Privacy Policy
             </motion.p>
           </CardFooter>
         </form>

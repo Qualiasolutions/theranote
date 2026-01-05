@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'TheraNote - AI-Assisted Clinical Documentation',
   description: 'Clinical documentation platform for special education therapy providers',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
