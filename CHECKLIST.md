@@ -13,14 +13,14 @@
 |----------|------|-------|---|
 | Authentication | 4 | 4 | 100% |
 | Session Notes | 11 | 13 | 85% |
-| Goal Tracking | 5 | 8 | 63% |
+| Goal Tracking | 8 | 8 | 100% |
 | Compliance | 5 | 10 | 50% |
-| Reports/Exports | 6 | 10 | 60% |
+| Reports/Exports | 7 | 10 | 70% |
 | Admin Dashboard | 5 | 10 | 50% |
 | AI Features | 3 | 8 | 38% |
 | Incidents | 6 | 6 | 100% |
 | Student Mgmt | 6 | 7 | 86% |
-| **TOTAL** | **51** | **76** | **67%** |
+| **TOTAL** | **55** | **76** | **72%** |
 
 ---
 
@@ -69,9 +69,9 @@
 - [x] Progress value + unit + notes per session
 
 ### Visualization
-- [ ] Progress graphs/charts
-- [ ] Historical trend display
-- [ ] Baseline vs current comparison
+- [x] Progress graphs/charts (Recharts: ProgressChart, SingleGoalProgressChart)
+- [x] Historical trend display (line/area charts with trend analysis)
+- [x] Baseline vs current comparison (reference lines in charts)
 
 **Files:** `src/components/goals/`, `src/components/sessions/goal-progress-tracker.tsx`
 
@@ -109,8 +109,8 @@
 - [x] Attendance report page
 - [x] Progress report page
 
-### Missing
-- [ ] PDF export (all reports)
+### PDF/Other
+- [x] PDF export for progress reports (`/api/export/pdf` with @react-pdf/renderer)
 - [ ] DOE/NYC-specific service log format
 - [ ] Medicaid billing export format
 - [ ] Weekly report generation
@@ -208,8 +208,8 @@
 - [ ] parent_contacts (parent portal)
 - [ ] expenses (finance module)
 
-### Security Issues
-- [ ] Fix `user_sites` RLS (enabled but no policies)
+### Security
+- [x] `user_sites` RLS policies in place
 
 **Files:** `src/types/database.ts`, Supabase project
 
@@ -237,10 +237,10 @@
 
 ## Priority Implementation Order
 
-### P0 - Critical (Ship Blockers)
-1. [ ] Fix `user_sites` RLS policies
-2. [ ] Progress graphs for goal tracking
-3. [ ] PDF export for reports
+### P0 - Critical (Ship Blockers) ✅ COMPLETE
+1. [x] Fix `user_sites` RLS policies (already had policies)
+2. [x] Progress graphs for goal tracking (ProgressChart + SingleGoalProgressChart)
+3. [x] PDF export for reports (`/api/export/pdf` with @react-pdf/renderer)
 
 ### P1 - High (Demo Quality)
 4. [ ] Make-up session tracking
