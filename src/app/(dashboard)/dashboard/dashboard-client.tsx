@@ -3,10 +3,41 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Plus, ArrowUpRight, TrendingUp, TrendingDown, Calendar, FileText, Sparkles, ChevronRight } from 'lucide-react'
-import { motion, StaggerContainer, StaggerItem, HoverCard } from '@/components/ui/motion'
+import {
+  Plus,
+  ArrowUpRight,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  FileText,
+  Sparkles,
+  ChevronRight,
+  Users,
+  Clock,
+  AlertTriangle,
+} from 'lucide-react'
+import { motion, HoverCard } from '@/components/ui/motion'
 import { cn } from '@/lib/utils'
 import type { LucideIcon } from 'lucide-react'
+import { ComplianceAlerts } from '@/components/compliance/compliance-alerts'
+import type { ComplianceViolation } from '@/lib/compliance/rules'
+
+interface Session {
+  id: string
+  session_date: string
+  discipline: string
+  status: string
+  student: { first_name: string; last_name: string } | null
+}
+
+interface DashboardClientProps {
+  studentCount: number
+  sessionCount: number
+  draftCount: number
+  recentSessions: Session[]
+  complianceViolations?: ComplianceViolation[]
+  complianceScore?: number
+}
 
 interface StatItem {
   name: string
@@ -20,20 +51,9 @@ interface StatItem {
   textColor: string
 }
 
-interface Session {
-  id: string
-  session_date: string
-  discipline: string
-  status: string
-  student: { first_name: string; last_name: string } | null
-}
-
-interface DashboardClientProps {
-  stats: StatItem[]
-  recentSessions: Session[]
-}
-
 function StatCard({ stat, index }: { stat: StatItem; index: number }) {
+  const Icon = stat.icon
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,7 +74,7 @@ function StatCard({ stat, index }: { stat: StatItem; index: number }) {
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               className={cn('p-2 rounded-xl', stat.bgColor)}
             >
-              <stat.icon className={cn('h-5 w-5', stat.textColor)} />
+              <Icon className={cn('h-5 w-5', stat.textColor)} />
             </motion.div>
           </CardHeader>
 
@@ -149,7 +169,61 @@ function SessionRow({ session, index }: { session: Session; index: number }) {
   )
 }
 
-export function DashboardClient({ stats, recentSessions }: DashboardClientProps) {
+export function DashboardClient({
+  studentCount,
+  sessionCount,
+  draftCount,
+  recentSessions,
+  complianceViolations = [],
+  complianceScore = 100,
+}: DashboardClientProps) {
+  const stats: StatItem[] = [
+    {
+      name: 'My Students',
+      value: studentCount,
+      description: 'Active caseload',
+      icon: Users,
+      trend: '+2 this week',
+      trendUp: true,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      textColor: 'text-blue-600',
+    },
+    {
+      name: 'Sessions This Month',
+      value: sessionCount,
+      description: 'Documented sessions',
+      icon: FileText,
+      trend: '+12%',
+      trendUp: true,
+      color: 'from-emerald-500 to-emerald-600',
+      bgColor: 'bg-emerald-50',
+      textColor: 'text-emerald-600',
+    },
+    {
+      name: 'Draft Notes',
+      value: draftCount,
+      description: 'Pending signature',
+      icon: Clock,
+      trend: 'Action needed',
+      trendUp: false,
+      color: 'from-amber-500 to-amber-600',
+      bgColor: 'bg-amber-50',
+      textColor: 'text-amber-600',
+    },
+    {
+      name: 'Missing Docs',
+      value: 0,
+      description: 'Overdue documentation',
+      icon: AlertTriangle,
+      trend: 'All clear',
+      trendUp: true,
+      color: 'from-rose-500 to-rose-600',
+      bgColor: 'bg-rose-50',
+      textColor: 'text-rose-600',
+    },
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -241,6 +315,20 @@ export function DashboardClient({ stats, recentSessions }: DashboardClientProps)
           </Link>
         </HoverCard>
       </motion.div>
+
+      {/* Compliance Alerts */}
+      {complianceViolations.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+        >
+          <ComplianceAlerts
+            violations={complianceViolations}
+            complianceScore={complianceScore}
+          />
+        </motion.div>
+      )}
 
       {/* Recent Sessions */}
       <motion.div

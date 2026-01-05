@@ -513,6 +513,14 @@ export function SOAPEditor({
             discipline={selectedStudent?.discipline || discipline}
             activeSection={activeSection}
             onInsert={insertText}
+            studentName={selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : undefined}
+            goals={goals.map(g => ({ description: g.description, domain: g.domain }))}
+            currentContent={{
+              subjective,
+              objective,
+              assessment,
+              plan,
+            }}
           />
         </div>
       )}

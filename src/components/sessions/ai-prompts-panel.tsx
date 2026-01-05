@@ -9,6 +9,15 @@ interface AIPromptsPanelProps {
   discipline: string
   activeSection: 'S' | 'O' | 'A' | 'P'
   onInsert: (text: string) => void
+  // Context for smarter AI prompts
+  studentName?: string
+  goals?: Array<{ description: string; domain: string | null }>
+  currentContent?: {
+    subjective: string
+    objective: string
+    assessment: string
+    plan: string
+  }
 }
 
 const sectionLabels = {
@@ -156,6 +165,9 @@ export function AIPromptsPanel({
   discipline,
   activeSection,
   onInsert,
+  studentName,
+  goals,
+  currentContent,
 }: AIPromptsPanelProps) {
   const [loading, setLoading] = useState(false)
   const [customPrompts, setCustomPrompts] = useState<string[]>([])
@@ -169,12 +181,47 @@ export function AIPromptsPanel({
   const generateCustomPrompts = async () => {
     setLoading(true)
     try {
+      // Build context for smarter AI prompts
+      const context: {
+        studentName?: string
+        goals?: string[]
+        previousContent?: string
+      } = {}
+
+      if (studentName) {
+        context.studentName = studentName
+      }
+
+      if (goals && goals.length > 0) {
+        context.goals = goals.map(g =>
+          `${g.domain ? `[${g.domain}] ` : ''}${g.description}`
+        )
+      }
+
+      // Include relevant previous content based on active section
+      if (currentContent) {
+        const sections: string[] = []
+        if (activeSection !== 'S' && currentContent.subjective) {
+          sections.push(`Subjective: ${currentContent.subjective}`)
+        }
+        if (activeSection !== 'O' && activeSection !== 'S' && currentContent.objective) {
+          sections.push(`Objective: ${currentContent.objective}`)
+        }
+        if (activeSection === 'P' && currentContent.assessment) {
+          sections.push(`Assessment: ${currentContent.assessment}`)
+        }
+        if (sections.length > 0) {
+          context.previousContent = sections.join('\n')
+        }
+      }
+
       const response = await fetch('/api/ai/prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           discipline,
           section: activeSection,
+          context: Object.keys(context).length > 0 ? context : undefined,
         }),
       })
 

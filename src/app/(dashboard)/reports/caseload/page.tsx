@@ -170,10 +170,12 @@ export default async function CaseloadReportPage() {
             <CardTitle>Student Caseload</CardTitle>
             <CardDescription>Detailed view of each student on your caseload</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <a href="/api/export/caseload" download>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </a>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

@@ -122,10 +122,12 @@ export default async function ServiceLogReportPage() {
             <CardTitle>Service Log by Student</CardTitle>
             <CardDescription>Breakdown of services provided this month</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <a href="/api/export/service-log" download>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </a>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

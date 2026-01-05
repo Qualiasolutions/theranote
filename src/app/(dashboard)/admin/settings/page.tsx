@@ -10,9 +10,8 @@ import {
   Shield,
   Mail,
   UserPlus,
-  Settings,
-  Trash2
 } from 'lucide-react'
+import { DeleteUserButton, RevokeInvitationButton } from '@/components/admin/admin-actions'
 
 interface User {
   id: string
@@ -176,9 +175,7 @@ export default async function AdminSettingsPage() {
                     </td>
                     <td className="p-3 text-right">
                       {u.id !== user.id && (
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <DeleteUserButton userId={u.id} userName={u.full_name} />
                       )}
                     </td>
                   </tr>
@@ -225,9 +222,7 @@ export default async function AdminSettingsPage() {
                         {invite.invited_by?.full_name || 'Unknown'}
                       </td>
                       <td className="p-3 text-right">
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                          Revoke
-                        </Button>
+                        <RevokeInvitationButton invitationId={invite.id} email={invite.email} />
                       </td>
                     </tr>
                   ))}
