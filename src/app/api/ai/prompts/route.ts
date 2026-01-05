@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateSOAPPrompts } from '@/lib/ai/gemini'
+import { generateSOAPPrompts } from '@/lib/ai/openrouter'
 
 export async function POST(request: NextRequest) {
   try {
