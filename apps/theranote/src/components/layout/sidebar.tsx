@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import type { Profile } from '@/types/database'
@@ -92,9 +93,13 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Logo */}
       <div className="h-14 flex items-center px-4 border-b border-white/[0.06]">
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
-            <span className="text-sm font-bold text-black">T</span>
-          </div>
+          <Image
+            src="https://images.squarespace-cdn.com/content/v1/65bf52f873aac538961445c5/19d16cc5-aa83-437c-9c2a-61de5268d5bf/Untitled+design+-+2025-01-19T070746.544.png?format=1500w"
+            alt="TheraNote"
+            width={28}
+            height={28}
+            className="rounded-lg"
+          />
           <span className="text-[15px] font-semibold text-white tracking-tight">
             TheraNote
           </span>
