@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd apps/theranote && pnpm build",
+  "buildCommand": "pnpm turbo build --filter=theranote",
   "installCommand": "pnpm install",
   "outputDirectory": "apps/theranote/.next",
-  "framework": "nextjs",
+  "framework": null,
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/theranote packages"
 }

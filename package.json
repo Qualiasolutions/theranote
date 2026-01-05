@@ -14,6 +14,7 @@
     "db:gen-types": "supabase gen types typescript --project-id etxvaajfgigmxoxjimrr > packages/database/src/types.ts"
   },
   "devDependencies": {
+    "next": "^15.1.3",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2"
   },
