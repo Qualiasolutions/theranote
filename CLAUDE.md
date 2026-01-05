@@ -83,8 +83,9 @@ src/
 │       ├── ai/prompts/      # OpenRouter AI endpoint
 │       └── export/          # CSV export endpoints
 ├── components/
-│   ├── ui/                  # shadcn/ui components
-│   ├── admin/               # Admin components (invite-form)
+│   ├── ui/                  # shadcn/ui components + motion utilities
+│   ├── admin/               # Admin components (invite-form, actions)
+│   ├── compliance/          # Compliance alerts component
 │   ├── goals/               # Goal components
 │   ├── incidents/           # Incident form
 │   ├── layout/              # Header, sidebar
@@ -92,6 +93,7 @@ src/
 │   └── sessions/            # SOAP editor, AI prompts, goal tracker
 ├── lib/
 │   ├── ai/                  # OpenRouter integration
+│   ├── compliance/          # Compliance rules engine
 │   ├── supabase/            # Supabase clients (server, client, middleware)
 │   └── utils.ts             # Utility functions
 └── types/
@@ -135,6 +137,11 @@ src/
 |----------|--------|---------|
 | `/api/ai/prompts` | POST | Generate SOAP prompts via OpenRouter |
 | `/api/export/attendance` | GET | Export attendance CSV |
+| `/api/export/service-log` | GET | Export service log CSV (NYC DOE format) |
+| `/api/export/caseload` | GET | Export caseload summary CSV |
+| `/api/export/progress-report` | GET | Export progress report CSV |
+| `/api/admin/users/[id]` | DELETE | Remove team member |
+| `/api/admin/invitations/[id]` | DELETE | Revoke invitation |
 
 ## Disciplines Supported
 
@@ -187,6 +194,8 @@ const { data } = await supabase
 
 ## Related Documents
 
+- `ROADMAP.md` - Feature completion status and upcoming work
+- `~/.claude/plans/glittery-cuddling-lemon.md` - Implementation plan (phases, priorities)
 - `_bmad-output/planning-artifacts/product-brief-theranote-2026-01-05.md`
 - `_bmad-output/planning-artifacts/prd.md`
 - `_bmad-output/planning-artifacts/architecture.md`
