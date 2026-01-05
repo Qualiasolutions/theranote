@@ -7,67 +7,144 @@ TheraNote is an AI-assisted clinical documentation platform for preschool specia
 **Built by:** Qualia Solutions
 **Purpose:** Functional demo for prospective client
 **Phase:** MVP - TheraNote (clinical documentation)
+**Repository:** https://github.com/Qualiasolutions/theranote
 
 ## Tech Stack
 
-- **Framework:** Next.js 15+ (App Router, React 19, TypeScript)
+- **Framework:** Next.js 15.5 (App Router, React 19, TypeScript)
 - **Database:** Supabase (PostgreSQL + Auth + RLS)
 - **Styling:** Tailwind CSS + shadcn/ui
-- **AI:** Google Gemini for text assistance
+- **AI:** OpenRouter API (google/gemini-flash-1.5)
 - **Deployment:** Vercel
 
 ## Key Commands
 
 ```bash
-pnpm install          # Install dependencies
-pnpm dev              # Start dev server (localhost:3000)
-pnpm build            # Production build
-pnpm lint             # Run linting
-pnpm type-check       # TypeScript check
+npm install           # Install dependencies
+npm run dev           # Start dev server (localhost:3000)
+npm run build         # Production build
+npm run lint          # Run linting
 ```
 
-## Database Setup
+## Environment Variables
 
-1. Create a Supabase project
-2. Run the migration in `supabase/migrations/001_initial_schema.sql`
-3. Copy `.env.local.example` to `.env.local` and fill in credentials
+```bash
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://etxvaajfgigmxoxjimrr.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+OPENROUTER_API_KEY=your-openrouter-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+## Supabase Project
+
+- **Project ID:** etxvaajfgigmxoxjimrr
+- **Region:** eu-west-1
+- **Demo User:** fawzi@qualia.com / Iloverobots1
+
+## Database Schema
+
+### Core Tables
+| Table | Purpose |
+|-------|---------|
+| `organizations` | Multi-tenant root |
+| `sites` | Locations within org |
+| `profiles` | User accounts (extends auth.users) |
+| `students` | Children receiving services |
+| `goals` | IEP/IFSP goals |
+| `sessions` | Session notes (SOAP format) |
+| `session_goals` | Goal progress per session |
+| `caseloads` | Therapist-student assignments |
+| `incidents` | Behavior incident documentation |
+| `invitations` | User invitation system |
+| `audit_logs` | Activity tracking |
+
+### Key Relationships
+- Organization -> Sites -> Students
+- Therapist -> Caseloads -> Students
+- Student -> Goals -> Session_Goals
+- Session -> Session_Goals
+- Student -> Incidents
 
 ## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── (auth)/           # Login, signup pages
-│   ├── (dashboard)/      # Protected app pages
-│   └── api/              # API routes
+│   ├── (auth)/              # Login, signup pages
+│   ├── (dashboard)/         # Protected app pages
+│   │   ├── admin/           # Admin pages (settings, compliance)
+│   │   ├── dashboard/       # Main dashboard
+│   │   ├── incidents/       # Behavior incidents
+│   │   ├── reports/         # Reports (attendance, progress)
+│   │   ├── sessions/        # Session notes
+│   │   └── students/        # Student management
+│   └── api/
+│       ├── ai/prompts/      # OpenRouter AI endpoint
+│       └── export/          # CSV export endpoints
 ├── components/
-│   ├── ui/               # shadcn/ui components
-│   ├── layout/           # Header, sidebar
-│   └── sessions/         # SOAP editor, AI prompts
+│   ├── ui/                  # shadcn/ui components
+│   ├── admin/               # Admin components (invite-form)
+│   ├── goals/               # Goal components
+│   ├── incidents/           # Incident form
+│   ├── layout/              # Header, sidebar
+│   ├── reports/             # Report generators
+│   └── sessions/            # SOAP editor, AI prompts, goal tracker
 ├── lib/
-│   └── supabase/         # Supabase clients
-├── types/
-│   └── database.ts       # TypeScript types
-└── hooks/                # Custom React hooks
+│   ├── ai/                  # OpenRouter integration
+│   ├── supabase/            # Supabase clients (server, client, middleware)
+│   └── utils.ts             # Utility functions
+└── types/
+    └── database.ts          # TypeScript types (generated)
 ```
 
-## Core Entities
+## Key Features
 
-- **Organization** - Multi-tenant root
-- **Site** - Location within org
-- **Student** - Children receiving services
-- **Goal** - IEP/IFSP goals
-- **Session** - Session notes (SOAP format)
-- **Caseload** - Therapist-student assignments
+### Clinical Documentation
+- SOAP note editor with discipline-specific AI prompts
+- Goal progress tracking per session
+- Multiple attendance statuses (present, absent, makeup, cancelled)
+- Electronic signature with timestamp
 
-## Key Features (MVP)
+### Goal Management
+- IEP/IFSP goal tracking by domain
+- Baseline and target criteria
+- Progress status (baseline, in_progress, met, discontinued)
+- Session-linked progress data
 
-1. User auth with role-based access
-2. Student management
-3. SOAP note editor with AI prompts
-4. Goal tracking
-5. Basic reporting
-6. Admin dashboard
+### Behavior Incidents
+- ABC analysis (Antecedent, Behavior, Consequence)
+- Severity levels (low, medium, high, critical)
+- Notification tracking (parent, admin, follow-up)
+- Type classification (behavior, elopement, injury, medical, safety, communication)
+
+### Reports
+- Attendance logs with CSV export
+- Progress reports with goal summaries
+- Compliance dashboard for admins
+
+### Admin Tools
+- Organization settings
+- User invitation system
+- Team management
+- Security settings
+
+## API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/ai/prompts` | POST | Generate SOAP prompts via OpenRouter |
+| `/api/export/attendance` | GET | Export attendance CSV |
+
+## Disciplines Supported
+
+- Speech-Language Pathology (speech)
+- Occupational Therapy (ot)
+- Physical Therapy (pt)
+- Applied Behavior Analysis (aba)
+- Counseling/Psychology (counseling)
+- Special Education Itinerant Teacher (seit)
+- Special Class Integrated Setting (scis)
 
 ## Security
 
@@ -75,15 +152,38 @@ src/
 - Row-Level Security on all tables
 - No PHI sent to AI services
 - Audit logging enabled
+- Multi-tenant data isolation via org_id
 
 ## AI Integration
 
+Uses OpenRouter API with `google/gemini-flash-1.5` model.
+
 AI provides formatting assistance only:
-- Smart prompts by discipline
+- Smart prompts by discipline and SOAP section
 - Clinical vocabulary suggestions
-- Compliance validation
+- Context-aware sentence starters
 
 **Critical:** AI never generates clinical observations - therapist inputs all content.
+
+## Common Development Tasks
+
+### Add a new page
+1. Create file in `src/app/(dashboard)/[route]/page.tsx`
+2. Use server components for data fetching
+3. Add to sidebar navigation in `src/components/layout/sidebar.tsx`
+
+### Add a database table
+1. Create migration via `mcp__plugin_supabase_supabase__apply_migration`
+2. Add RLS policies
+3. Regenerate types: `npx supabase gen types typescript`
+
+### Update TypeScript types for Supabase
+When adding tables not in types, use type assertions:
+```typescript
+const { data } = await supabase
+  .from('new_table')
+  .insert(data as never)
+```
 
 ## Related Documents
 
