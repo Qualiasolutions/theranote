@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Users, FileText, AlertTriangle, CheckCircle, Settings } from 'lucide-react'
+import { Users, FileText, AlertTriangle, CheckCircle, Settings, Shield } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function AdminPage() {
@@ -111,7 +111,10 @@ export default async function AdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Compliance Overview</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-600" />
+              Compliance Overview
+            </CardTitle>
             <CardDescription>Documentation compliance by therapist</CardDescription>
           </CardHeader>
           <CardContent>
@@ -126,9 +129,11 @@ export default async function AdminPage() {
                   style={{ width: `${completionRate}%` }}
                 />
               </div>
-              <Button className="w-full" variant="outline">
-                View Detailed Report
-              </Button>
+              <Link href="/admin/compliance">
+                <Button className="w-full" variant="outline">
+                  View Compliance Dashboard
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

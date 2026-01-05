@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   Shield,
+  AlertTriangle,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Students', href: '/students', icon: Users },
   { name: 'Sessions', href: '/sessions', icon: FileText },
+  { name: 'Incidents', href: '/incidents', icon: AlertTriangle },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
 ]
 
