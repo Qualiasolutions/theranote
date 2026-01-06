@@ -1,22 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Building2, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Building2, Loader2, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react'
+import { motion } from '@/components/ui/motion'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
+    setError(null)
     setLoading(true)
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -35,87 +40,182 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            <Building2 className="h-10 w-10 text-purple-600" />
-            <span className="text-2xl font-bold text-gray-900">ThriveSync</span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Mobile logo */}
+      <div className="lg:hidden flex justify-center mb-8">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 bg-purple-500/30 blur-lg rounded-lg" />
+            <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-white" />
+            </div>
           </div>
+          <div>
+            <span className="text-2xl font-bold text-foreground tracking-tight">
+              ThriveSync
+            </span>
+            <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
+              <Sparkles className="h-2.5 w-2.5" />
+              <span>Operations Hub</span>
+            </div>
+          </div>
+        </Link>
+      </div>
 
-          <h2 className="text-xl font-semibold text-center text-gray-900 mb-2">
-            Welcome back
-          </h2>
-          <p className="text-center text-gray-500 mb-6">
-            Sign in to your operations dashboard
-          </p>
+      <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+        <CardHeader className="text-center pb-2">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+            <CardDescription className="mt-2">
+              Sign in to your ThriveSync dashboard
+            </CardDescription>
+          </motion.div>
+        </CardHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleLogin}>
+          <CardContent className="space-y-4 pt-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-red-50 text-red-600 text-sm p-3 rounded-xl border border-red-200"
+              >
                 {error}
-              </div>
+              </motion.div>
             )}
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-2"
+            >
+              <Label htmlFor="email" className="text-sm font-medium">
                 Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                placeholder="you@example.com"
-              />
-            </div>
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500/20"
+                  required
+                />
+              </div>
+            </motion.div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-2"
             >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              Sign In
-            </button>
-          </form>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-purple-600 hover:text-purple-700 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500/20"
+                  required
+                />
+              </div>
+            </motion.div>
+          </CardContent>
 
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{' '}
-            <Link href="/signup" className="text-purple-600 hover:text-purple-700 font-medium">
-              Sign up
-            </Link>
-          </p>
-
-          {/* TheraNote Link */}
-          <div className="mt-6 pt-6 border-t">
-            <a
-              href="http://localhost:3000/login"
-              className="block text-center text-sm text-gray-500 hover:text-purple-600"
+          <CardFooter className="flex flex-col gap-4 pt-2">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="w-full"
             >
-              Looking for TheraNote? Click here →
-            </a>
-          </div>
+              <Button
+                type="submit"
+                className="w-full h-11 rounded-xl gap-2 shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-sm text-muted-foreground text-center"
+            >
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup"
+                className="text-purple-600 font-medium hover:text-purple-700 transition-colors"
+              >
+                Sign up
+              </Link>
+            </motion.p>
+          </CardFooter>
+        </form>
+      </Card>
+
+      {/* Demo credentials */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="mt-6 p-4 rounded-xl bg-purple-50 border border-purple-100"
+      >
+        <p className="text-xs font-medium text-purple-700 mb-2">Demo Credentials</p>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p>Email: polina@thera.com</p>
+          <p>Password: sprinkleofmillions</p>
         </div>
-      </div>
-    </div>
+      </motion.div>
+
+      {/* TheraNote Link */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        className="mt-4 text-center"
+      >
+        <a
+          href="https://theranote-delta.vercel.app/login"
+          className="text-sm text-gray-500 hover:text-purple-600 transition-colors"
+        >
+          Looking for TheraNote? Click here →
+        </a>
+      </motion.div>
+    </motion.div>
   )
 }

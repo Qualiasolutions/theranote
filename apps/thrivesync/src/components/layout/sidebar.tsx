@@ -15,9 +15,12 @@ import {
   Settings,
   LogOut,
   ExternalLink,
+  Menu,
+  X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -33,14 +36,32 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileOpen(false)
+  }, [pathname])
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isMobileOpen])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/login')
   }
 
-  return (
-    <div className="flex h-full w-56 flex-col bg-[hsl(var(--sidebar-bg))] shrink-0">
+  const sidebarContent = (
+    <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 px-4 border-b border-white/[0.06]">
         <Image
@@ -109,5 +130,48 @@ export function Sidebar() {
         </a>
       </div>
     </div>
+  )
+
+  return (
+    <>
+      {/* Mobile menu button */}
+      <button
+        onClick={() => setIsMobileOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-40 p-2.5 rounded-lg bg-[hsl(var(--sidebar-bg))] text-white/80 hover:text-white transition-colors"
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          onClick={() => setIsMobileOpen(false)}
+          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity"
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      <aside
+        className={cn(
+          'lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-[hsl(var(--sidebar-bg))] transition-transform duration-300 ease-out',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <button
+          onClick={() => setIsMobileOpen(false)}
+          className="absolute top-3 right-3 p-2 rounded-md text-white/40 hover:text-white/80 hover:bg-white/10 transition-colors"
+          aria-label="Close menu"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        {sidebarContent}
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-56 bg-[hsl(var(--sidebar-bg))] shrink-0">
+        {sidebarContent}
+      </aside>
+    </>
   )
 }

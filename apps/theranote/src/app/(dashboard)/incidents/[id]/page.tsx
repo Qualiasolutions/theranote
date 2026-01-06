@@ -40,7 +40,7 @@ export default async function IncidentDetailPage({ params }: PageProps) {
       antecedent: string
       behavior: string
       consequence: string
-      interventions_used: string[]
+      interventions: string | null
       outcome: string
       injuries: boolean
       injury_description: string | null
@@ -175,14 +175,8 @@ export default async function IncidentDetailPage({ params }: PageProps) {
             <CardTitle>Interventions Used</CardTitle>
           </CardHeader>
           <CardContent>
-            {incident.interventions_used && incident.interventions_used.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {incident.interventions_used.map((intervention: string, idx: number) => (
-                  <span key={idx} className="px-2 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
-                    {intervention}
-                  </span>
-                ))}
-              </div>
+            {incident.interventions ? (
+              <p>{incident.interventions}</p>
             ) : (
               <p className="text-muted-foreground">No interventions recorded</p>
             )}
