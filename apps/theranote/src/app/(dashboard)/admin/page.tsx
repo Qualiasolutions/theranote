@@ -100,12 +100,16 @@ export default async function AdminPage() {
             <CardDescription>Manage therapists and staff accounts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button className="w-full" variant="outline">
-              View All Users
-            </Button>
-            <Button className="w-full" variant="outline">
-              Invite New User
-            </Button>
+            <Link href="/admin/settings">
+              <Button className="w-full" variant="outline">
+                View All Users
+              </Button>
+            </Link>
+            <Link href="/admin/settings/invite">
+              <Button className="w-full" variant="outline">
+                Invite New User
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 

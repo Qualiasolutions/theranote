@@ -44,15 +44,15 @@ export default async function SessionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4">
-        <Button variant="outline" size="sm">
+      <div className="flex flex-wrap gap-2 sm:gap-4">
+        <Button variant="outline" size="sm" className="h-10">
           <Filter className="h-4 w-4 mr-2" />
           All Status
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="h-10">
           This Week
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="h-10">
           This Month
         </Button>
       </div>
@@ -71,25 +71,25 @@ export default async function SessionsPage() {
               {sessions.map((session) => (
                 <div
                   key={session.id}
-                  className="py-4 flex items-center justify-between hover:bg-gray-50 -mx-6 px-6 transition-colors"
+                  className="py-4 flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 -mx-4 sm:-mx-6 px-4 sm:px-6 transition-colors gap-3"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <p className="font-medium">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
                         {session.student?.first_name} {session.student?.last_name}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground truncate">
                         {formatDate(session.session_date)} &bull; {session.discipline} &bull;{' '}
                         {session.duration_minutes} min
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4 ml-[52px] sm:ml-0">
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${
+                      className={`px-2 py-1 text-xs rounded-full whitespace-nowrap ${
                         session.status === 'signed'
                           ? 'bg-green-100 text-green-700'
                           : session.status === 'draft'
@@ -102,7 +102,7 @@ export default async function SessionsPage() {
                       {session.status}
                     </span>
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${
+                      className={`px-2 py-1 text-xs rounded-full whitespace-nowrap ${
                         session.attendance_status === 'present'
                           ? 'bg-green-100 text-green-700'
                           : session.attendance_status === 'absent'
@@ -113,7 +113,7 @@ export default async function SessionsPage() {
                       {session.attendance_status}
                     </span>
                     <Link href={`/sessions/${session.id}`}>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="h-10 min-w-[44px]">
                         {session.status === 'draft' ? 'Edit' : 'View'}
                       </Button>
                     </Link>

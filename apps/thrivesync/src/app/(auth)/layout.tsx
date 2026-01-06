@@ -9,12 +9,12 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen flex">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-[hsl(var(--sidebar-bg))] relative overflow-hidden">
         {/* Background patterns */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-400/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
         </div>
 
         {/* Grid pattern overlay */}
@@ -32,8 +32,8 @@ export default function AuthLayout({
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-purple-400/30 blur-lg rounded-lg" />
-              <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+              <div className="absolute inset-0 bg-primary/30 blur-lg rounded-lg" />
+              <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
             </div>
@@ -53,7 +53,7 @@ export default function AuthLayout({
             <div className="max-w-md">
               <h1 className="text-4xl font-bold text-white leading-tight mb-6">
                 Operations management,{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-indigo-300">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-400">
                   simplified
                 </span>
               </h1>
@@ -70,7 +70,7 @@ export default function AuthLayout({
                   'CFR cost allocation reports',
                 ].map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-gradient-to-r from-purple-400 to-indigo-400" />
+                    <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-indigo-400" />
                     <span className="text-white/80">{feature}</span>
                   </div>
                 ))}
@@ -86,7 +86,7 @@ export default function AuthLayout({
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-purple-50 via-white to-indigo-50/30">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
         <div className="w-full max-w-md">
           {children}
         </div>

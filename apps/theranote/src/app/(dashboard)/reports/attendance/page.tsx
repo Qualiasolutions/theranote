@@ -89,7 +89,7 @@ export default async function AttendanceReportPage() {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
@@ -153,8 +153,8 @@ export default async function AttendanceReportPage() {
         </CardHeader>
         <CardContent>
           {byStudent && Object.keys(byStudent).length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-3 font-medium">Student</th>
@@ -207,8 +207,8 @@ export default async function AttendanceReportPage() {
         </CardHeader>
         <CardContent>
           {sessions && sessions.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full min-w-[700px] text-sm">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-3 font-medium">Date</th>

@@ -164,7 +164,7 @@ export function ExpenseForm({ onClose, onSuccess }: ExpenseFormProps) {
 
           <div className="space-y-5">
             {/* Amount and Date Row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Amount <span className="text-red-500">*</span>
@@ -257,7 +257,7 @@ export function ExpenseForm({ onClose, onSuccess }: ExpenseFormProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cost Allocation (CFR)
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {ALLOCATION_TYPES.map((type) => (
                   <label
                     key={type.value}
@@ -291,7 +291,7 @@ export function ExpenseForm({ onClose, onSuccess }: ExpenseFormProps) {
             </div>
 
             {/* Status and Payment Method Row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status

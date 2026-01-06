@@ -137,7 +137,7 @@ export default async function StaffPage({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl bg-white p-4 shadow-sm border">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-purple-100 p-2">
@@ -223,7 +223,8 @@ export default async function StaffPage({
 
         {/* Staff Table */}
         <div className="rounded-xl bg-white shadow-sm border overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -351,6 +352,7 @@ export default async function StaffPage({
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, AlertTriangle, Clock, User, FileText, Bell } from 'lucide-react'
 import Link from 'next/link'
+import { IncidentActions } from '@/components/incidents/incident-actions'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -48,6 +49,7 @@ export default async function IncidentDetailPage({ params }: PageProps) {
       admin_notified: boolean
       follow_up_required: boolean
       follow_up_notes: string | null
+      status: string
       created_at: string
       student: { first_name: string; last_name: string } | null
       reporter: { first_name: string; last_name: string } | null
@@ -90,9 +92,20 @@ export default async function IncidentDetailPage({ params }: PageProps) {
             </p>
           </div>
         </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${severityColors[incident.severity] || severityColors.medium}`}>
-          {incident.severity.charAt(0).toUpperCase() + incident.severity.slice(1)} Severity
-        </span>
+        <div className="flex items-center gap-3">
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+            incident.status === 'closed'
+              ? 'bg-green-100 text-green-700'
+              : incident.status === 'reviewed'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-yellow-100 text-yellow-700'
+          }`}>
+            {incident.status?.charAt(0).toUpperCase() + incident.status?.slice(1) || 'Open'}
+          </span>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium border ${severityColors[incident.severity] || severityColors.medium}`}>
+            {incident.severity.charAt(0).toUpperCase() + incident.severity.slice(1)} Severity
+          </span>
+        </div>
       </div>
 
       {/* Quick Info */}
@@ -254,11 +267,14 @@ export default async function IncidentDetailPage({ params }: PageProps) {
       )}
 
       {/* Actions */}
-      <div className="flex justify-end gap-4">
+      <div className="flex justify-between items-center">
         <Link href="/incidents">
-          <Button variant="outline">Back to Incidents</Button>
+          <Button variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Incidents
+          </Button>
         </Link>
-        <Button variant="outline">Print Report</Button>
+        <IncidentActions incidentId={incident.id} currentStatus={incident.status || 'open'} />
       </div>
     </div>
   )

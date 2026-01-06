@@ -49,8 +49,8 @@ export default function LoginPage() {
       <div className="lg:hidden flex justify-center mb-8">
         <Link href="/" className="flex items-center gap-3">
           <div className="relative">
-            <div className="absolute inset-0 bg-purple-500/30 blur-lg rounded-lg" />
-            <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+            <div className="absolute inset-0 bg-primary/30 blur-lg rounded-lg" />
+            <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-white" />
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function LoginPage() {
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-red-50 text-red-600 text-sm p-3 rounded-xl border border-red-200"
+                className="bg-destructive/10 text-destructive text-sm p-3 rounded-xl border border-destructive/20"
               >
                 {error}
               </motion.div>
@@ -109,7 +109,7 @@ export default function LoginPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500/20"
+                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
                   required
                 />
               </div>
@@ -127,7 +127,7 @@ export default function LoginPage() {
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-purple-600 hover:text-purple-700 transition-colors"
+                  className="text-xs text-primary hover:text-primary/80 transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -140,7 +140,7 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-purple-500 focus:ring-purple-500/20"
+                  className="pl-10 h-11 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
                   required
                 />
               </div>
@@ -156,7 +156,7 @@ export default function LoginPage() {
             >
               <Button
                 type="submit"
-                className="w-full h-11 rounded-xl gap-2 shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300"
+                className="w-full h-11 rounded-xl gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                 disabled={loading}
               >
                 {loading ? (
@@ -179,7 +179,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{' '}
               <Link
                 href="/signup"
-                className="text-purple-600 font-medium hover:text-purple-700 transition-colors"
+                className="text-primary font-medium hover:text-primary/80 transition-colors"
               >
                 Sign up
               </Link>
@@ -193,9 +193,9 @@ export default function LoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="mt-6 p-4 rounded-xl bg-purple-50 border border-purple-100"
+        className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/10"
       >
-        <p className="text-xs font-medium text-purple-700 mb-2">Demo Credentials</p>
+        <p className="text-xs font-medium text-primary mb-2">Demo Credentials</p>
         <div className="text-xs text-muted-foreground space-y-1">
           <p>Email: polina@thera.com</p>
           <p>Password: sprinkleofmillions</p>
@@ -211,7 +211,7 @@ export default function LoginPage() {
       >
         <a
           href="https://theranote-delta.vercel.app/login"
-          className="text-sm text-gray-500 hover:text-purple-600 transition-colors"
+          className="text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           Looking for TheraNote? Click here →
         </a>

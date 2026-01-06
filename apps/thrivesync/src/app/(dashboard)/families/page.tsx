@@ -96,20 +96,20 @@ export default async function FamiliesPage({
 
       <div className="p-6 space-y-6">
         {/* Actions Bar */}
-        <div className="flex items-center justify-between">
-          <form className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <form className="relative w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="search"
               name="search"
               defaultValue={params.search}
               placeholder="Search by student or contact name..."
-              className="h-10 w-80 rounded-lg border bg-white pl-10 pr-4 text-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="h-10 w-full sm:w-80 rounded-lg border bg-white pl-10 pr-4 text-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
           </form>
           <Link
             href="/families/log"
-            className="flex items-center gap-2 h-10 px-4 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors"
+            className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors shrink-0"
           >
             <Plus className="h-4 w-4" />
             Log Communication
@@ -117,7 +117,7 @@ export default async function FamiliesPage({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div className="rounded-xl bg-white p-4 shadow-sm border">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-purple-100 p-2">

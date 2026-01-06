@@ -78,27 +78,27 @@ export function Header({ user }: HeaderProps) {
             <span className="text-xs font-medium text-emerald-700">Online</span>
           </div>
 
-          {/* Notifications */}
+          {/* Notifications - 44px touch target */}
           <motion.div whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
-              className="relative h-8 w-8 rounded-lg hover:bg-black/[0.04]"
+              className="relative h-11 w-11 rounded-lg hover:bg-black/[0.04]"
             >
-              <Bell className="h-4 w-4 text-muted-foreground" />
-              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 bg-red-500 rounded-full" />
+              <Bell className="h-5 w-5 text-muted-foreground" />
+              <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full" />
             </Button>
           </motion.div>
 
-          {/* Sign out */}
+          {/* Sign out - 44px touch target */}
           <motion.div whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
               onClick={handleSignOut}
-              className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
+              className="h-11 w-11 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-5 w-5" />
             </Button>
           </motion.div>
         </div>
