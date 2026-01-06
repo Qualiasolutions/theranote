@@ -120,7 +120,7 @@ export function Sidebar() {
       {/* TheraNote Link */}
       <div className="border-t border-white/[0.06] p-2">
         <a
-          href="http://localhost:3000"
+          href="https://theranote-delta.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-white/50 hover:bg-white/[0.05] hover:text-white/70 transition-colors duration-150"
