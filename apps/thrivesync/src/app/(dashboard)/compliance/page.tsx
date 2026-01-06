@@ -316,3 +316,5 @@ export default async function CompliancePage() {
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

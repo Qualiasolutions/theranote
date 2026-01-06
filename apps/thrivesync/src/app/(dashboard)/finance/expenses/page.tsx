@@ -43,3 +43,4 @@ export default function ExpensesPage() {
     </>
   )
 }
+export const dynamic = 'force-dynamic'

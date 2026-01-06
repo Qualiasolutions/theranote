@@ -452,3 +452,5 @@ export default async function ClassroomDetailPage({ params }: Props) {
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

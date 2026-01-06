@@ -379,3 +379,5 @@ export default async function FinanceDashboardPage({
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

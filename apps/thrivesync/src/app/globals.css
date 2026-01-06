@@ -4,69 +4,72 @@
 
 @layer base {
   :root {
-    /* Premium neutral foundation - warm slate for ThriveSync */
-    --background: 210 20% 99%;
-    --foreground: 222 47% 11%;
+    /* Premium neutral foundation - Linear/Vercel inspired (unified with TheraNote) */
+    --background: 0 0% 99%;
+    --foreground: 0 0% 9%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 9%;
 
-    /* ThriveSync primary - sophisticated indigo */
+    /* ThriveSync accent - subtle indigo for differentiation */
     --primary: 245 58% 51%;
     --primary-foreground: 0 0% 100%;
 
     /* Subtle secondary */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
     /* Muted and accent */
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 222 47% 11%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
-    /* Status colors */
+    /* Status colors - refined, professional */
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning-foreground: 0 0% 9%;
 
     /* UI elements */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
     --ring: 245 58% 51%;
     --radius: 0.625rem;
 
-    /* Sidebar */
-    --sidebar-bg: 222 47% 8%;
+    /* Sidebar - sophisticated dark */
+    --sidebar-bg: 0 0% 7%;
     --sidebar-foreground: 0 0% 85%;
-    --sidebar-muted: 222 47% 15%;
-    --sidebar-accent: 222 47% 20%;
-    --sidebar-border: 222 47% 15%;
+    --sidebar-muted: 0 0% 15%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-border: 0 0% 15%;
+
+    /* ThriveSync accent - indigo for CTAs */
+    --accent-indigo: 245 58% 51%;
   }
 
   .dark {
-    --background: 222 47% 8%;
+    --background: 0 0% 7%;
     --foreground: 0 0% 93%;
-    --card: 222 47% 11%;
+    --card: 0 0% 9%;
     --card-foreground: 0 0% 93%;
-    --popover: 222 47% 11%;
+    --popover: 0 0% 9%;
     --popover-foreground: 0 0% 93%;
     --primary: 245 58% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 15%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 93%;
-    --muted: 222 47% 15%;
+    --muted: 0 0% 15%;
     --muted-foreground: 0 0% 55%;
-    --accent: 222 47% 15%;
+    --accent: 0 0% 15%;
     --accent-foreground: 0 0% 93%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 222 47% 15%;
-    --input: 222 47% 15%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
     --ring: 245 58% 61%;
   }
 }
@@ -88,10 +91,12 @@
     letter-spacing: -0.011em;
   }
 
+  /* Premium focus styles */
   *:focus-visible {
     @apply outline-none ring-2 ring-ring/20 ring-offset-2 ring-offset-background;
   }
 
+  /* Typography refinements */
   h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.025em;
     font-weight: 600;
@@ -103,6 +108,7 @@
 }
 
 @layer utilities {
+  /* Premium glass effect - subtle, sophisticated */
   .glass {
     @apply backdrop-blur-xl bg-white/90 border border-black/[0.04];
   }
@@ -111,14 +117,16 @@
     @apply backdrop-blur-xl bg-black/60 border border-white/[0.06];
   }
 
+  /* Subtle gradient background */
   .gradient-subtle {
     background: linear-gradient(
       135deg,
-      hsl(210 20% 99%) 0%,
-      hsl(220 14% 97%) 100%
+      hsl(0 0% 99%) 0%,
+      hsl(0 0% 97%) 100%
     );
   }
 
+  /* Premium card shadow */
   .shadow-premium {
     box-shadow:
       0 0 0 1px rgba(0, 0, 0, 0.03),
@@ -133,6 +141,7 @@
       0 24px 48px rgba(0, 0, 0, 0.08);
   }
 
+  /* Hover lift effect */
   .hover-lift {
     @apply transition-all duration-300 ease-out;
   }
@@ -145,6 +154,27 @@
       0 24px 48px rgba(0, 0, 0, 0.08);
   }
 
+  /* Subtle border accent */
+  .border-accent-top {
+    @apply relative;
+  }
+
+  .border-accent-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--foreground) / 0.1),
+      transparent
+    );
+  }
+
+  /* Premium animations */
   @keyframes fade-up {
     from {
       opacity: 0;
@@ -161,6 +191,12 @@
     to { opacity: 1; }
   }
 
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   .animate-fade-up {
     animation: fade-up 0.4s ease-out forwards;
   }
@@ -169,6 +205,11 @@
     animation: fade-in 0.3s ease-out forwards;
   }
 
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Stagger children - cleaner timing */
   .stagger-children > * {
     opacity: 0;
     animation: fade-up 0.4s ease-out forwards;
@@ -183,6 +224,7 @@
   .stagger-children > *:nth-child(7) { animation-delay: 0.14s; }
   .stagger-children > *:nth-child(8) { animation-delay: 0.16s; }
 
+  /* Custom scrollbar - minimal */
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
@@ -206,6 +248,7 @@
     background: hsl(var(--muted-foreground) / 0.3);
   }
 
+  /* Hide scrollbar */
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -215,6 +258,7 @@
     display: none;
   }
 
+  /* Status indicator dot */
   .status-dot {
     @apply h-2 w-2 rounded-full;
   }
@@ -236,11 +280,13 @@
 }
 
 @layer components {
+  /* Premium transition curves */
   .transition-premium {
     @apply transition-all duration-200;
     transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 
+  /* Stat card style */
   .stat-card {
     @apply relative bg-white rounded-xl border border-black/[0.04] p-5;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -251,6 +297,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
+  /* Navigation item */
   .nav-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150;
   }
@@ -263,6 +310,7 @@
     @apply text-white/60 hover:bg-white/5 hover:text-white/90;
   }
 
+  /* Premium badge */
   .badge-premium {
     @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium;
   }
@@ -281,5 +329,10 @@
 
   .badge-neutral {
     @apply bg-gray-100 text-gray-700 ring-1 ring-gray-600/10;
+  }
+
+  /* Indigo accent for ThriveSync-specific elements */
+  .badge-indigo {
+    @apply bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10;
   }
 }

@@ -264,3 +264,5 @@ export default async function StudentFamilyPage({
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

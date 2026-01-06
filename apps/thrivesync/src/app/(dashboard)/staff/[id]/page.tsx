@@ -304,3 +304,5 @@ export default async function StaffDetailPage({
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

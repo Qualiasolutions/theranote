@@ -53,7 +53,7 @@ export default async function DashboardPage() {
       `)
       .eq('therapist_id', user?.id || '')
       .order('session_date', { ascending: false })
-      .limit(5) as Promise<{ data: Array<{
+      .limit(5) as unknown as Promise<{ data: Array<{
         id: string
         session_date: string
         discipline: string
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
       `)
       .eq('therapist_id', user?.id || '')
       .eq('status', 'draft')
-      .gte('session_date', thirtyDaysAgo.toISOString()) as Promise<{ data: Session[] | null }>
+      .gte('session_date', thirtyDaysAgo.toISOString()) as unknown as Promise<{ data: Session[] | null }>
   ])
 
   // Check compliance

@@ -399,9 +399,5 @@ export default async function CategoryDetailPage({ params }: PageProps) {
   )
 }
 
-// Generate static paths for categories
-export async function generateStaticParams() {
-  return Object.keys(categoryConfig).map((category) => ({
-    category,
-  }))
-}
+// Force dynamic rendering since this page requires Supabase data
+export const dynamic = 'force-dynamic'

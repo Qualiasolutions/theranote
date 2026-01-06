@@ -261,3 +261,4 @@ export default function ReportsPage() {
     </>
   )
 }
+export const dynamic = 'force-dynamic'

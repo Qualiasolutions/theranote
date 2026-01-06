@@ -247,3 +247,5 @@ export default async function FamiliesPage({
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'

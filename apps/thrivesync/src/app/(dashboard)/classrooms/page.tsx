@@ -206,3 +206,5 @@ export default async function ClassroomsPage() {
     </>
   )
 }
+
+export const dynamic = 'force-dynamic'
