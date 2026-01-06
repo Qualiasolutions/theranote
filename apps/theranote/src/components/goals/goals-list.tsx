@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { Target, ChevronDown, ChevronUp, Check, Pause, X, BarChart3 } from 'lucide-react'
-import { ProgressChart } from './progress-chart'
+import { Target, ChevronDown, ChevronUp, Check, Pause, X, BarChart3, Loader2 } from 'lucide-react'
+
+// Lazy load the ProgressChart to reduce initial bundle size (Recharts is heavy)
+const ProgressChart = lazy(() => import('./progress-chart').then(mod => ({ default: mod.ProgressChart })))
 
 interface Goal {
   id: string
@@ -219,13 +221,19 @@ export function GoalsList({ goals, studentId }: GoalsListProps) {
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                     <h4 className="text-sm font-medium">Progress Over Time</h4>
                   </div>
-                  <ProgressChart
-                    goalId={goal.id}
-                    studentId={studentId}
-                    title={goal.description}
-                    baseline={goal.baseline}
-                    targetCriteria={goal.target_criteria}
-                  />
+                  <Suspense fallback={
+                    <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg border">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  }>
+                    <ProgressChart
+                      goalId={goal.id}
+                      studentId={studentId}
+                      title={goal.description}
+                      baseline={goal.baseline}
+                      targetCriteria={goal.target_criteria}
+                    />
+                  </Suspense>
                 </div>
               </div>
             </div>

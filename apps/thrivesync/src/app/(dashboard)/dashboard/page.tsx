@@ -42,45 +42,65 @@ function calculateRatioMet(
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  const { count: staffCount } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
+  // Run all queries in parallel for optimal performance
+  const [
+    { count: staffCount },
+    { count: studentCount },
+    { data: complianceItemsRaw },
+    { data: evidenceRaw },
+    { count: alertCount },
+    { data: staffWithCredentialsRaw },
+    { data: classroomsRaw }
+  ] = await Promise.all([
+    // Query 1: Staff count
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
 
-  const { count: studentCount } = await supabase
-    .from('students')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active')
+    // Query 2: Active student count
+    supabase.from('students').select('*', { count: 'exact', head: true }).eq('status', 'active'),
 
-  const { data: complianceItemsRaw } = await supabase
-    .from('compliance_items')
-    .select('*')
+    // Query 3: Compliance items (only needed fields)
+    supabase.from('compliance_items').select('id, category'),
+
+    // Query 4: Approved evidence (only needed fields)
+    supabase.from('compliance_evidence').select('id, compliance_item_id, expiration_date, status').eq('status', 'approved'),
+
+    // Query 5: Alert count
+    supabase.from('compliance_alerts').select('*', { count: 'exact', head: true }).eq('resolved', false),
+
+    // Query 6: Staff with credentials (only needed fields)
+    supabase.from('profiles').select(`id, full_name, staff_credentials (id, credential_name, expiration_date)`),
+
+    // Query 7: Classrooms with counts
+    supabase.from('classrooms')
+      .select(`id, name, room_type, ratio_requirement, classroom_assignments!left(id), classroom_staff!left(id)`)
+      .eq('status', 'active')
+      .order('name')
+      .limit(6)
+  ])
 
   const complianceItems = (complianceItemsRaw || []) as ComplianceItem[]
-
-  const { data: evidenceRaw } = await supabase
-    .from('compliance_evidence')
-    .select('*')
-    .eq('status', 'approved')
-
   const evidence = (evidenceRaw || []) as ComplianceEvidence[]
 
+  // Build evidence lookup map for O(1) access instead of O(n) find()
+  const evidenceByItemId = new Map<string, ComplianceEvidence>()
+  evidence.forEach(e => {
+    if (!evidenceByItemId.has(e.compliance_item_id) ||
+        (e.expiration_date && new Date(e.expiration_date) > new Date())) {
+      evidenceByItemId.set(e.compliance_item_id, e)
+    }
+  })
+
+  const now = new Date()
   const totalItems = complianceItems.length
   const compliantItems = complianceItems.filter((item) => {
-    const itemEvidence = evidence.find(
-      (e) => e.compliance_item_id === item.id && e.status === 'approved'
-    )
+    const itemEvidence = evidenceByItemId.get(item.id)
     if (!itemEvidence) return false
     if (itemEvidence.expiration_date) {
-      return new Date(itemEvidence.expiration_date) > new Date()
+      return new Date(itemEvidence.expiration_date) > now
     }
     return true
   }).length
   const complianceScore = totalItems > 0 ? Math.round((compliantItems / totalItems) * 100) : 100
-
-  const { count: alertCount } = await supabase
-    .from('compliance_alerts')
-    .select('*', { count: 'exact', head: true })
-    .eq('resolved', false)
 
   const stats = [
     { name: 'Total Staff', value: staffCount || 0, icon: Users, change: 'Team members' },
@@ -89,18 +109,9 @@ export default async function DashboardPage() {
     { name: 'Alerts', value: alertCount || 0, icon: AlertCircle, change: (alertCount || 0) > 0 ? 'Action needed' : 'All clear' },
   ]
 
-  const { data: staffWithCredentialsRaw } = await supabase
-    .from('profiles')
-    .select(`
-      id,
-      full_name,
-      staff_credentials (*)
-    `)
-
   type ProfileWithCredentials = Profile & { staff_credentials: StaffCredential[] }
   const staffWithCredentials = (staffWithCredentialsRaw as unknown as ProfileWithCredentials[]) || []
 
-  const now = new Date()
   const credentialAlerts: {
     expired: { staffName: string; credentialType: string; daysOverdue: number }[]
     expiringSoon: { staffName: string; credentialType: string; daysUntil: number }[]
@@ -111,6 +122,7 @@ export default async function DashboardPage() {
     expiringLater: [],
   }
 
+  // Process credentials efficiently
   staffWithCredentials.forEach((staff) => {
     const credentials = staff.staff_credentials || []
     credentials.forEach((cred) => {
@@ -144,17 +156,6 @@ export default async function DashboardPage() {
   credentialAlerts.expired.sort((a, b) => b.daysOverdue - a.daysOverdue)
   credentialAlerts.expiringSoon.sort((a, b) => a.daysUntil - b.daysUntil)
   credentialAlerts.expiringLater.sort((a, b) => a.daysUntil - b.daysUntil)
-
-  const { data: classroomsRaw } = await supabase
-    .from('classrooms')
-    .select(`
-      *,
-      classroom_assignments!left(id, student_id),
-      classroom_staff!left(id, profile_id)
-    `)
-    .eq('status', 'active')
-    .order('name')
-    .limit(6)
 
   type ClassroomWithCounts = {
     id: string
