@@ -4,29 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TheraNote is an AI-assisted clinical documentation platform for preschool special-education programs (4410, early intervention, CPSE).
+TheraNote/ThriveSync is a Turborepo monorepo containing two apps for preschool special-education programs:
 
-**Built by:** Qualia Solutions
-**Purpose:** Functional demo for prospective client
-**Phase:** MVP Complete
-**Repository:** https://github.com/Qualiasolutions/theranote
+- **TheraNote** (port 3000) - Clinical documentation for therapists (SOAP notes, goals, compliance)
+- **ThriveSync** (port 3001) - Operations management for administrators (staff, classrooms, finance)
 
-## Key Commands
+**Status:** 91% complete, MVP demo-ready
+**Deployment:** https://theranote-delta.vercel.app (TheraNote only)
+
+## Commands
 
 ```bash
-npm run dev           # Start dev server with Turbopack (localhost:3000)
-npm run build         # Production build
-npm run lint          # ESLint
-npm run type-check    # TypeScript validation (tsc --noEmit)
+# Development
+pnpm dev              # Run both apps (3000 + 3001)
+pnpm dev:theranote    # Run TheraNote only
+pnpm dev:thrivesync   # Run ThriveSync only
 
-# Database types - requires SUPABASE_PROJECT_ID env var
-npm run db:gen-types  # Regenerate src/types/database.ts
+# Build & Lint
+pnpm build            # Build all apps
+pnpm lint             # Lint all apps
+pnpm type-check       # TypeScript validation
+
+# Database types
+pnpm db:gen-types     # Regenerate packages/database/src/types.ts
+
+# Clean slate
+pnpm clean            # Remove all node_modules and .next
 ```
 
 ## Environment Variables
 
 ```bash
-# .env.local
+# .env.local (root level)
 NEXT_PUBLIC_SUPABASE_URL=https://etxvaajfgigmxoxjimrr.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 OPENROUTER_API_KEY=your-openrouter-key
@@ -35,49 +44,51 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Supabase Project
 
-- **Project ID:** etxvaajfgigmxoxjimrr
+- **Project ID:** `etxvaajfgigmxoxjimrr`
 - **Region:** eu-west-1
-- **Demo User:** fawzi@qualia.com / Iloverobots1
+- **Demo User:** polina@thera.com / sprinkleofmillions
 
 ## Architecture
 
+### Monorepo Structure
+
+```
+apps/
+  theranote/           # Clinical app (Next.js 15, port 3000)
+    src/app/           # App Router pages
+    src/components/    # React components
+    src/lib/           # supabase/, ai/, compliance/
+  thrivesync/          # Operations app (Next.js 15, port 3001)
+
+packages/
+  database/            # @repo/database - Supabase types + client factories
+  ui/                  # @repo/ui - Shared shadcn components
+  auth/                # @repo/auth - Shared auth utilities
+  config/              # Shared config
+```
+
 ### Supabase Client Pattern
 
-Three client variants for different contexts:
+The `@repo/database` package exports context-specific clients:
 
-| File | Use Case |
-|------|----------|
-| `lib/supabase/server.ts` | Server Components, Route Handlers (async cookies) |
-| `lib/supabase/client.ts` | Client Components (browser) |
-| `lib/supabase/middleware.ts` | Next.js middleware (session refresh) |
+```typescript
+// Server Components, Route Handlers (uses cookies())
+import { createServerClient } from '@repo/database/server'
 
-Always use `createClient()` from the appropriate module based on context.
+// Client Components (browser)
+import { createBrowserClient } from '@repo/database/client'
 
-### Authentication Flow
+// Middleware (session refresh)
+import { updateSession } from '@repo/database/middleware'
+```
 
-Middleware (`src/middleware.ts`) handles route protection:
-- Protected paths: `/dashboard`, `/students`, `/sessions`, `/reports`, `/admin`
-- Auth paths (`/login`, `/signup`) redirect to dashboard if already logged in
-- Session refresh happens automatically via Supabase SSR cookies
+Each app also has local wrappers in `src/lib/supabase/` that re-export these.
 
-### Compliance Engine
+### Authentication
 
-`lib/compliance/rules.ts` implements NYC DOE/NYSED regulations:
-
-- `checkSigningCompliance()` - 7-day signing deadline enforcement
-- `checkSOAPCompleteness()` - Required SOAP sections validation
-- `checkGoalProgressDocumentation()` - Progress tracking verification
-- `checkFrequencyCompliance()` - IEP service frequency compliance
-- `validateBeforeSign()` - Pre-signature validation
-
-Violations are typed as `critical | warning | info` and sorted by severity.
-
-### AI Integration
-
-`lib/ai/openrouter.ts` - OpenRouter API with `google/gemini-flash-1.5`:
-- Generates discipline-specific SOAP prompts
-- Falls back to hardcoded defaults on API failure
-- **No PHI sent to AI** - only context like student name, goals, section type
+Middleware at `apps/theranote/src/middleware.ts` handles route protection:
+- Protected: `/dashboard`, `/students`, `/sessions`, `/reports`, `/admin`, `/assistant`, `/incidents`
+- Auth pages (`/login`, `/signup`) redirect to dashboard if already authenticated
 
 ### Multi-Tenant Data Model
 
@@ -85,55 +96,87 @@ Violations are typed as `critical | warning | info` and sorted by severity.
 organizations
   └── sites
        └── students
-            ├── goals → session_goals
-            ├── sessions
-            └── incidents
+            ├── goals → session_goals (progress per session)
+            ├── sessions (SOAP notes)
+            └── incidents (ABC behavioral)
 ```
 
-All tables use `org_id` for RLS isolation. User-org relationship via `user_organizations` join table.
-
-## Database Schema
-
-### Core Tables
-
-| Table | Purpose |
-|-------|---------|
-| `organizations` | Multi-tenant root |
-| `sites` | Locations within org |
-| `profiles` | User accounts (extends auth.users) |
-| `students` | Children receiving services |
-| `goals` | IEP/IFSP goals by domain |
-| `sessions` | SOAP notes with signature tracking |
-| `session_goals` | Progress data per session |
-| `caseloads` | Therapist-student assignments |
-| `incidents` | Behavior documentation (ABC format) |
-| `invitations` | User invitation system |
-| `audit_logs` | Activity tracking |
+All queries filter by `org_id` with RLS. User-org relationship via `user_organizations`.
 
 ### Key Enums
 
 - **Roles:** `therapist`, `admin`, `billing`
 - **Disciplines:** `speech`, `ot`, `pt`, `aba`, `counseling`, `seit`, `scis`
-- **Session status:** `draft`, `signed`
+- **Session status:** `draft` → `signed`
 - **Attendance:** `present`, `absent`, `makeup`, `cancelled`
 - **Goal status:** `baseline`, `in_progress`, `met`, `discontinued`
-- **Incident severity:** `low`, `medium`, `high`, `critical`
+
+### Compliance Engine
+
+`apps/theranote/src/lib/compliance/rules.ts` implements NYC DOE/NYSED regulations:
+
+| Function | Rule |
+|----------|------|
+| `checkSigningCompliance()` | 7-day signing deadline |
+| `checkSOAPCompleteness()` | Required SOAP sections |
+| `checkGoalProgressDocumentation()` | Progress tracking |
+| `checkFrequencyCompliance()` | IEP service frequency |
+| `validateBeforeSign()` | Pre-signature validation |
+
+Violations are typed as `critical | warning | info`.
+
+### AI Integration
+
+`apps/theranote/src/lib/ai/openrouter.ts` uses OpenRouter API with `google/gemini-flash-1.5`:
+
+| Function | Purpose |
+|----------|---------|
+| `generateSOAPPrompts()` | Sentence starters for SOAP sections |
+| `generateFullNote()` | Complete SOAP or narrative note |
+| `analyzeNoteForMissingElements()` | Check note completeness |
+
+Falls back to hardcoded defaults on API failure. No PHI sent to AI.
 
 ## API Endpoints
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/ai/prompts` | POST | Generate SOAP prompts via OpenRouter |
-| `/api/export/attendance` | GET | Attendance CSV (date range filter) |
-| `/api/export/service-log` | GET | NYC DOE format service log CSV |
-| `/api/export/caseload` | GET | Caseload summary CSV |
-| `/api/export/progress-report` | GET | Goal progress analysis CSV |
-| `/api/admin/users/[id]` | DELETE | Remove team member |
-| `/api/admin/invitations/[id]` | DELETE | Revoke invitation |
+### TheraNote
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/ai/prompts` | Generate SOAP prompts |
+| `POST /api/ai/generate-note` | Full note generation |
+| `POST /api/ai/analyze-note` | Missing element detection |
+| `POST /api/ai/chat` | Chat completions |
+| `GET /api/export/attendance` | Attendance CSV |
+| `GET /api/export/service-log` | Service log CSV |
+| `GET /api/export/service-log-doe` | NYC DOE format |
+| `GET /api/export/caseload` | Caseload CSV |
+| `GET /api/export/progress-report` | Progress CSV |
+| `GET/POST/PUT/DELETE /api/admin/caseloads` | Caseload management |
+| `DELETE /api/admin/users/[id]` | Remove user |
+| `DELETE /api/admin/invitations/[id]` | Revoke invitation |
+
+### ThriveSync
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/export/staff-roster` | Staff list CSV |
+| `GET /api/export/credentials` | Credential status CSV |
+| `GET /api/export/attendance` | Staff attendance CSV |
+| `GET /api/export/expenses` | Expense report CSV |
+| `GET /api/export/compliance-overview` | All compliance categories |
+| `GET /api/export/article-47` | Article 47 DOHMH compliance |
+| `GET /api/export/cost-allocation` | CFR cost allocation |
 
 ## Type Handling
 
-When working with tables not fully in `database.ts`, use type assertions:
+After schema changes, regenerate types:
+
+```bash
+pnpm db:gen-types
+```
+
+Types live in `packages/database/src/types.ts`. For tables not yet in types, use assertions:
 
 ```typescript
 const { data } = await supabase
@@ -141,13 +184,9 @@ const { data } = await supabase
   .insert(data as never)
 ```
 
-After schema changes, regenerate types:
-```bash
-SUPABASE_PROJECT_ID=etxvaajfgigmxoxjimrr npm run db:gen-types
-```
+## Vercel Deployment
 
-## Related Documents
-
-- `ROADMAP.md` - Feature completion matrix and upcoming work
-- `_bmad-output/planning-artifacts/architecture.md` - Full architecture spec
-- `_bmad-output/planning-artifacts/prd.md` - Product requirements
+`vercel.json` configures single-app deployment for TheraNote only:
+- Build: `pnpm turbo build --filter=theranote`
+- Output: `apps/theranote/.next`
+- Ignores changes outside `apps/theranote` and `packages/`

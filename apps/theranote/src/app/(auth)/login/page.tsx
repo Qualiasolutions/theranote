@@ -197,8 +197,8 @@ export default function LoginPage() {
       >
         <p className="text-xs font-medium text-primary mb-2">Demo Credentials</p>
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>Email: fawzi@qualia.com</p>
-          <p>Password: Iloverobots1</p>
+          <p>Email: polina@thera.com</p>
+          <p>Password: sprinkleofmillions</p>
         </div>
       </motion.div>
     </motion.div>
