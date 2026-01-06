@@ -10,7 +10,9 @@ TheraNote/ThriveSync is a Turborepo monorepo containing two apps for preschool s
 - **ThriveSync** (port 3001) - Operations management for administrators (staff, classrooms, finance)
 
 **Status:** 91% complete, MVP demo-ready
-**Deployment:** https://theranote-delta.vercel.app (TheraNote only)
+**Deployments:**
+- TheraNote: https://theranote-delta.vercel.app
+- ThriveSync: https://thrivesync-lac.vercel.app
 
 ## Commands
 
