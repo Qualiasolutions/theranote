@@ -224,21 +224,26 @@ export default async function CompliancePage() {
                 <p className="font-medium">Article 47 Checklist</p>
                 <p className="text-sm text-gray-500">DOHMH requirements</p>
               </Link>
-              <button className="p-4 rounded-lg border hover:bg-gray-50 hover:border-purple-200 text-left transition-colors">
-                <ShieldCheck className="h-6 w-6 text-purple-600 mb-2" />
-                <p className="font-medium">Audit Binder</p>
-                <p className="text-sm text-gray-500">Generate reports</p>
-              </button>
-              <button className="p-4 rounded-lg border hover:bg-gray-50 hover:border-purple-200 text-left transition-colors">
-                <Upload className="h-6 w-6 text-purple-600 mb-2" />
-                <p className="font-medium">Evidence Library</p>
-                <p className="text-sm text-gray-500">Upload documents</p>
-              </button>
-              <button className="p-4 rounded-lg border hover:bg-gray-50 hover:border-purple-200 text-left transition-colors">
+              <div className="p-4 rounded-lg border bg-gray-50 text-left opacity-60 cursor-not-allowed relative">
+                <ShieldCheck className="h-6 w-6 text-gray-400 mb-2" />
+                <p className="font-medium text-gray-600">Audit Binder</p>
+                <p className="text-sm text-gray-400">Generate reports</p>
+                <span className="absolute top-2 right-2 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Soon</span>
+              </div>
+              <div className="p-4 rounded-lg border bg-gray-50 text-left opacity-60 cursor-not-allowed relative">
+                <Upload className="h-6 w-6 text-gray-400 mb-2" />
+                <p className="font-medium text-gray-600">Evidence Library</p>
+                <p className="text-sm text-gray-400">Upload documents</p>
+                <span className="absolute top-2 right-2 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Soon</span>
+              </div>
+              <Link
+                href="/staff"
+                className="p-4 rounded-lg border hover:bg-gray-50 hover:border-purple-200 text-left transition-colors"
+              >
                 <Clock className="h-6 w-6 text-purple-600 mb-2" />
                 <p className="font-medium">Expiration Tracker</p>
                 <p className="text-sm text-gray-500">Credential alerts</p>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

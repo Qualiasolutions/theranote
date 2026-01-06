@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
-import { Plus, School, AlertTriangle, CheckCircle, ClipboardList } from 'lucide-react'
+import { School, AlertTriangle, CheckCircle, ClipboardList } from 'lucide-react'
 import Link from 'next/link'
 import { ClassroomCard } from './classroom-card'
+import { AddClassroomDialog } from '@/components/classrooms/add-classroom-dialog'
 
 // Calculate if ratio is met
 function calculateRatioMet(
@@ -131,10 +132,7 @@ export default async function ClassroomsPage() {
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-2 h-10 px-4 rounded-lg bg-purple-600 text-white text-sm hover:bg-purple-700">
-            <Plus className="h-4 w-4" />
-            Add Classroom
-          </button>
+          <AddClassroomDialog />
         </div>
 
         {/* Stats */}
@@ -192,10 +190,7 @@ export default async function ClassroomsPage() {
             <p className="text-sm text-gray-500 mb-4">
               Get started by adding your first classroom
             </p>
-            <button className="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-purple-600 text-white text-sm hover:bg-purple-700">
-              <Plus className="h-4 w-4" />
-              Add Classroom
-            </button>
+            <AddClassroomDialog />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
